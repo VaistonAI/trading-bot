@@ -1,0 +1,12 @@
+# Render Deployment Configuration
+# Este archivo le dice a Render cómo construir y ejecutar tu aplicación
+
+# Build Command
+build = "npm install"
+
+# Start Command  
+start = "node server.js"
+
+# Environment
+[env]
+NODE_VERSION = "18"
