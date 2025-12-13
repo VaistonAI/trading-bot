@@ -152,34 +152,6 @@ function setupTradingRoutes(app, getAlpacaHeaders) {
             );
 
             const positions = await bot.getPositions();
-
-            // Guardar en Firebase
-            if (req.query.userId) {
-                const db = admin.firestore();
-                const batch = db.batch();
-
-                for (const position of positions) {
-                    const docRef = db.collection('users')
-                        .doc(req.query.userId)
-                        .collection('trading')
-                        .doc('positions')
-                        .collection('active')
-                        .doc(position.symbol);
-
-                    batch.set(docRef, {
-                        symbol: position.symbol,
-                        qty: parseFloat(position.qty),
-                        avgPrice: parseFloat(position.avg_entry_price),
-                        currentPrice: parseFloat(position.current_price),
-                        pnl: parseFloat(position.unrealized_pl),
-                        pnlPercent: parseFloat(position.unrealized_plpc) * 100,
-                        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-
-                await batch.commit();
-            }
-
             res.json(positions);
 
         } catch (error) {
