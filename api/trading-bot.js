@@ -288,5 +288,3 @@ class TradingBot {
 }
 
 module.exports = { TradingBot };
-
-module.exports = TradingBot;
