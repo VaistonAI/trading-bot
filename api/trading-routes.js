@@ -1,4 +1,4 @@
-const TradingBot = require('./trading-bot');
+const { TradingBot } = require('./trading-bot');
 const { admin, db } = require('./firebase-admin');
 
 // Inicializar bot (se creará por usuario)
