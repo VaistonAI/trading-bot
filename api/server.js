@@ -16,6 +16,8 @@ app.use(compression());
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'https://trading.vaiston.com',
+    'http://trading.vaiston.com',
     process.env.FRONTEND_URL || 'https://tudominio.com'
 ];
 
