@@ -509,18 +509,39 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
     let worstTrade = { symbol: '', pnl: Infinity };
     const positions = new Map();
 
-    console.log(`\n📊 Descargando datos históricos de Alpaca...`);
+    console.log(`\n📊 Descargando datos históricos de Alpaca (año por año)...`);
 
-    // Obtener datos históricos
+    // INSTITUCIONAL: Descargar datos año por año para evitar límites de Alpaca
     const historicalData = new Map();
+    const years = [
+        { start: '2023-01-01T00:00:00Z', end: '2023-12-31T23:59:59Z', label: '2023' },
+        { start: '2024-01-01T00:00:00Z', end: '2024-12-31T23:59:59Z', label: '2024' },
+        { start: '2025-01-01T00:00:00Z', end: '2025-12-15T23:59:59Z', label: '2025' }
+    ];
+
     for (const symbol of symbols) {
         try {
-            const bars = await getHistoricalBars(symbol, startDate, endDate, alpacaHeaders);
-            if (bars && bars.length > 0) {
-                historicalData.set(symbol, bars);
-                console.log(`   ✓ ${symbol}: ${bars.length} días`);
+            let allBars = [];
+
+            // Descargar datos de cada año
+            for (const yearRange of years) {
+                try {
+                    const yearBars = await getHistoricalBars(symbol, yearRange.start, yearRange.end, alpacaHeaders);
+                    if (yearBars && yearBars.length > 0) {
+                        allBars = allBars.concat(yearBars);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Pequeña pausa entre años
+                } catch (yearError) {
+                    console.error(`   ✗ ${symbol} (${yearRange.label}): ${yearError.message}`);
+                }
             }
-            await new Promise(resolve => setTimeout(resolve, 200));
+
+            if (allBars.length > 0) {
+                historicalData.set(symbol, allBars);
+                console.log(`   ✓ ${symbol}: ${allBars.length} barras (2023-2025)`);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 200)); // Pausa entre símbolos
         } catch (error) {
             console.error(`   ✗ ${symbol}: ${error.message}`);
         }
