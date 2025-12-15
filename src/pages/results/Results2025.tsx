@@ -22,7 +22,7 @@ interface SimulationResult {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export const Results2024: React.FC = () => {
+export const Results2025 = () => {
     const [results, setResults] = useState<SimulationResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
