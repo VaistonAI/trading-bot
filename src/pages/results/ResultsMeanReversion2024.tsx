@@ -273,3 +273,4 @@ export const Resultsmeanreversion2024 = () => {
     );
 };
 
+

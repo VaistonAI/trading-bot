@@ -273,3 +273,4 @@ export const ResultsMACD2025 = () => {
     );
 };
 
+
