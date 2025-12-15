@@ -788,6 +788,17 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         month.commissions = parseFloat(month.commissions.toFixed(2));
     });
 
+    // DEBUG: Mostrar resumen de meses con trades
+    console.log(`\n📊 Resumen Monthly Breakdown:`);
+    const monthsWithTrades = monthlyBreakdown.filter(m => m.trades > 0);
+    console.log(`   Total meses con trades: ${monthsWithTrades.length}/36`);
+    monthsWithTrades.slice(0, 5).forEach(m => {
+        console.log(`   ${m.monthYear}: ${m.trades} trades, P&L: $${m.pnl}`);
+    });
+    if (monthsWithTrades.length > 5) {
+        console.log(`   ... y ${monthsWithTrades.length - 5} meses más`);
+    }
+
     // ============================================
     // CALCULAR RESULTADOS FINALES + MÉTRICAS PROFESIONALES
     // ============================================
