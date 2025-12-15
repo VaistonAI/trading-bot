@@ -792,6 +792,13 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
     console.log(`\n📊 Resumen Monthly Breakdown:`);
     const monthsWithTrades = monthlyBreakdown.filter(m => m.trades > 0);
     console.log(`   Total meses con trades: ${monthsWithTrades.length}/36`);
+
+    // Mostrar distribución por año
+    const trades2023 = monthlyBreakdown.filter(m => m.year === 2023 && m.trades > 0).length;
+    const trades2024 = monthlyBreakdown.filter(m => m.year === 2024 && m.trades > 0).length;
+    const trades2025 = monthlyBreakdown.filter(m => m.year === 2025 && m.trades > 0).length;
+    console.log(`   Distribución: 2023=${trades2023} meses, 2024=${trades2024} meses, 2025=${trades2025} meses`);
+
     monthsWithTrades.slice(0, 5).forEach(m => {
         console.log(`   ${m.monthYear}: ${m.trades} trades, P&L: $${m.pnl}`);
     });
