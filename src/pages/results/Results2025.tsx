@@ -36,7 +36,7 @@ export const Results2025 = () => {
     const loadResults = async () => {
         try {
             setIsLoading(true);
-            const docRef = doc(db, 'simulations', '2024');
+            const docRef = doc(db, 'simulations', '2025');
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
@@ -56,7 +56,7 @@ export const Results2025 = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    year: 2024,
+                    year: 2025,
                     strategy: 'value',
                     symbols: ['SPY', 'SLV', 'XLF', 'QQQ', 'IWM', 'HYG', 'NVDA', 'TQQQ', 'SOXL', 'AVGO', 'ONDS', 'WULF', 'INTC', 'TE', 'DNN', 'FEIM', 'BBAI', 'BMNR'],
                     initialCapital: 10000
@@ -119,10 +119,10 @@ export const Results2025 = () => {
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-text-primary mb-2">
-                            Resultados 2024
+                            Resultados 2025
                         </h1>
                         <p className="text-text-secondary">
-                            Simulación histórica de la estrategia Value Investing en 2024
+                            Simulación histórica de la estrategia Value Investing en 2025 (YTD: Ene 1 - Dic 14)
                         </p>
                     </div>
                     <div className="flex gap-3">
@@ -270,7 +270,7 @@ export const Results2025 = () => {
                             No hay resultados disponibles
                         </h3>
                         <p className="text-text-secondary mb-6">
-                            Ejecuta la simulación para ver el rendimiento histórico de 2024
+                            Ejecuta la simulación para ver el rendimiento histórico de 2025 (año en curso)
                         </p>
                     </div>
                 )}
