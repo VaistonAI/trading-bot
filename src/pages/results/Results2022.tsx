@@ -22,7 +22,7 @@ interface SimulationResult {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export const Results2024: React.FC = () => {
+export const Results2022: React.FC = () => {
     const [results, setResults] = useState<SimulationResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
@@ -34,7 +34,7 @@ export const Results2024: React.FC = () => {
     const loadResults = async () => {
         try {
             setIsLoading(true);
-            const docRef = doc(db, 'simulations', '2024');
+            const docRef = doc(db, 'simulations', '2022');
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
@@ -54,7 +54,7 @@ export const Results2024: React.FC = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    year: 2024,
+                    year: 2022,
                     strategy: 'value',
                     symbols: ['SPY', 'SLV', 'XLF', 'QQQ', 'IWM', 'HYG', 'NVDA', 'TQQQ', 'SOXL', 'AVGO', 'ONDS', 'WULF', 'INTC', 'TE', 'DNN', 'FEIM', 'BBAI', 'BMNR'],
                     initialCapital: 10000
@@ -89,15 +89,14 @@ export const Results2024: React.FC = () => {
     return (
         <MainLayout>
             <div className="p-6">
-                {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h2 className="text-3xl font-bold text-text-primary mb-2 flex items-center gap-3">
                             <FaChartArea className="text-primary" />
-                            Resultados 2024
+                            Resultados 2022
                         </h2>
                         <p className="text-text-secondary">
-                            Simulación histórica de la estrategia Value Investing en 2024
+                            Simulación histórica de la estrategia Value Investing en 2022
                         </p>
                     </div>
                     {!results && (
@@ -117,7 +116,6 @@ export const Results2024: React.FC = () => {
 
                 {results ? (
                     <>
-                        {/* Status Badge */}
                         <div className="mb-6 flex items-center gap-2 text-green-600">
                             <FaCheckCircle />
                             <span className="font-semibold">
@@ -125,7 +123,6 @@ export const Results2024: React.FC = () => {
                             </span>
                         </div>
 
-                        {/* Main Metrics */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                             <div className="bg-white rounded-lg shadow-sm border border-border p-6">
                                 <p className="text-sm text-text-secondary mb-2">P&L Total</p>
@@ -156,7 +153,6 @@ export const Results2024: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Best/Worst Trades */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div className="bg-white rounded-lg shadow-sm border border-border p-6">
                                 <div className="flex items-center gap-2 mb-4">
@@ -181,7 +177,6 @@ export const Results2024: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Monthly Breakdown */}
                         <div className="bg-white rounded-lg shadow-sm border border-border p-6 mb-6">
                             <h3 className="text-xl font-semibold text-text-primary mb-4">Desglose Mensual</h3>
                             <div className="overflow-x-auto">
@@ -208,7 +203,6 @@ export const Results2024: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Capital Summary */}
                         <div className="bg-white rounded-lg shadow-sm border border-border p-6">
                             <h3 className="text-xl font-semibold text-text-primary mb-4">Resumen de Capital</h3>
                             <div className="grid grid-cols-2 gap-4">
@@ -230,7 +224,7 @@ export const Results2024: React.FC = () => {
                             No hay resultados disponibles
                         </h3>
                         <p className="text-text-secondary mb-6">
-                            Ejecuta la simulación para ver el rendimiento histórico de 2024
+                            Ejecuta la simulación para ver el rendimiento histórico de 2022
                         </p>
                     </div>
                 )}

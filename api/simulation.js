@@ -1,9 +1,7 @@
 const fetch = require('node-fetch');
+const { admin, db } = require('./firebase-admin');
 
 const ALPACA_DATA_URL = 'https://data.alpaca.markets';
-
-// In-memory storage for simulations
-const simulationCache = new Map();
 
 /**
  * Obtiene datos históricos de Alpaca
@@ -51,11 +49,17 @@ function calculateValueSignal(bars) {
  * Ejecuta una simulación de backtesting para un año específico
  */
 async function runSimulation(year, strategy, symbols, initialCapital, alpacaHeaders) {
-    // Check if already cached
-    const cacheKey = `${year}-${strategy}`;
-    if (simulationCache.has(cacheKey)) {
-        console.log(`📦 Returning cached simulation for ${year}`);
-        return simulationCache.get(cacheKey);
+    // Check if already exists in Firebase
+    try {
+        const docRef = db.collection('simulations').doc(year.toString());
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+            console.log(`📦 Returning existing simulation from Firebase for ${year}`);
+            return doc.data();
+        }
+    } catch (error) {
+        console.log('Firebase check failed, proceeding with new simulation');
     }
 
     console.log(`\n🔄 Iniciando backtesting REAL para ${year}...`);
@@ -223,11 +227,17 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         worstTrade,
         monthlyBreakdown,
         trades: trades.slice(0, 100), // Limitar a 100 trades para no sobrecargar
-        ranAt: new Date().toISOString()
+        ranAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
-    // Cache the results
-    simulationCache.set(cacheKey, results);
+    // Save to Firebase
+    try {
+        await db.collection('simulations').doc(year.toString()).set(results);
+        console.log(`💾 Resultados guardados en Firebase`);
+    } catch (error) {
+        console.error('Error saving to Firebase:', error.message);
+    }
 
     console.log(`\n✅ Backtesting completado:`);
     console.log(`   Total Trades: ${trades.length}`);

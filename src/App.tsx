@@ -20,6 +20,8 @@ import { Research } from './pages/research/Research';
 import { LiveTrading } from './pages/trading/LiveTrading';
 import { DailyReports } from './pages/reports/DailyReports';
 import { Results2024 } from './pages/results/Results2024';
+import { Results2023 } from './pages/results/Results2023';
+import { Results2022 } from './pages/results/Results2022';
 import { UserManagement } from './pages/users/UserManagement';
 import { HelpPage } from './pages/help/HelpPage';
 
@@ -107,6 +109,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Results2024 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results/2023"
+            element={
+              <ProtectedRoute>
+                <Results2023 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results/2022"
+            element={
+              <ProtectedRoute>
+                <Results2022 />
               </ProtectedRoute>
             }
           />
