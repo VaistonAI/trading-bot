@@ -50,6 +50,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Simulations Momentum collection
+    match /simulations-momentum/{year} {
+      // Only admins and investors can read simulations
+      allow read: if canViewReports();
+      // Only admins can write simulations from frontend
+      allow write: if isAdmin();
+    }
+    
     // Invitations collection
     match /invitations/{invitationId} {
       allow read: if isSignedIn();
