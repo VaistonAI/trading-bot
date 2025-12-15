@@ -299,8 +299,7 @@ export const Sidebar: React.FC = () => {
             permission: 'canViewStrategies',
             submenu: [
                 { path: '/results/2024', label: '2024' },
-                { path: '/results/2023', label: '2023' },
-                { path: '/results/2022', label: '2022' }
+                { path: '/results/2023', label: '2023' }
             ]
         },
         {
