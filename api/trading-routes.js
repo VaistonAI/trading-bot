@@ -32,15 +32,6 @@ function setupTradingRoutes(app, getAlpacaHeaders) {
             bot.start();
             activeBots.set(userId, bot);
 
-            // Guardar config en Firebase
-            await db.collection('users').doc(userId).collection('trading').doc('config').set({
-                botActive: true,
-                strategy: 'value',
-                capital,
-                maxPositions: 5,
-                startedAt: admin.firestore.FieldValue.serverTimestamp()
-            });
-
             // Ejecutar estrategia inmediatamente
             const result = await bot.executeStrategy(symbols || []);
 
@@ -70,12 +61,6 @@ function setupTradingRoutes(app, getAlpacaHeaders) {
                 bot.stop();
                 activeBots.delete(userId);
             }
-
-            // Actualizar Firebase
-            await db.collection('users').doc(userId).collection('trading').doc('config').update({
-                botActive: false,
-                stoppedAt: admin.firestore.FieldValue.serverTimestamp()
-            });
 
             res.json({
                 success: true,
