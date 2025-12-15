@@ -485,14 +485,25 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
     let capital = initialCapital;
     let totalCommissions = 0;
     const trades = [];
-    const monthlyBreakdown = Array(12).fill(null).map((_, i) => ({
-        month: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][i],
-        trades: 0,
-        pnl: 0,
-        grossPnl: 0,
-        commissions: 0
-    }));
+
+    // INSTITUCIONAL: Desglose mensual para 3 años (2023-2025) = 36 meses
+    const monthlyBreakdown = [];
+    const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    for (let year = 2023; year <= 2025; year++) {
+        for (let month = 0; month < 12; month++) {
+            monthlyBreakdown.push({
+                year,
+                month: monthNames[month],
+                monthYear: `${monthNames[month]} ${year}`,
+                trades: 0,
+                pnl: 0,
+                grossPnl: 0,
+                commissions: 0
+            });
+        }
+    }
 
     let bestTrade = { symbol: '', pnl: -Infinity };
     let worstTrade = { symbol: '', pnl: Infinity };
@@ -755,11 +766,17 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
             worstTrade = { symbol, pnl: netPnl };
         }
 
-        const month = parseInt(trade.date.split('-')[1]) - 1;
-        monthlyBreakdown[month].trades++;
-        monthlyBreakdown[month].grossPnl += grossPnl;
-        monthlyBreakdown[month].commissions += totalFees;
-        monthlyBreakdown[month].pnl += netPnl;
+        // Calcular índice del mes en el array de 36 meses
+        const tradeYear = parseInt(trade.date.split('-')[0]);
+        const tradeMonth = parseInt(trade.date.split('-')[1]) - 1; // 0-11
+        const monthIndex = (tradeYear - 2023) * 12 + tradeMonth;
+
+        if (monthIndex >= 0 && monthIndex < monthlyBreakdown.length) {
+            monthlyBreakdown[monthIndex].trades++;
+            monthlyBreakdown[monthIndex].grossPnl += grossPnl;
+            monthlyBreakdown[monthIndex].commissions += totalFees;
+            monthlyBreakdown[monthIndex].pnl += netPnl;
+        }
 
         console.log(`   ${symbol}: Cerrado @ $${executionPrice.toFixed(2)} | P&L: $${netPnl.toFixed(2)}`);
     }
