@@ -292,7 +292,19 @@ export const Sidebar: React.FC = () => {
         },
         {
             path: '/results/2024',
-            label: 'Resultados',
+            label: 'Resultados 2024',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies'
+        },
+        {
+            path: '/results/2023',
+            label: 'Resultados 2023',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies'
+        },
+        {
+            path: '/results/2022',
+            label: 'Resultados 2022',
             icon: <FaChartArea />,
             permission: 'canViewStrategies'
         },
