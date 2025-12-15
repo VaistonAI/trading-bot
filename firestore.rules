@@ -46,16 +46,16 @@ service cloud.firestore {
     match /simulations/{year} {
       // Only admins and investors can read simulations
       allow read: if canViewReports();
-      // Only admins can write simulations from frontend
-      allow write: if isAdmin();
+      // Admins and investors can write simulations from frontend
+      allow write: if canViewReports();
     }
     
     // Simulations Momentum collection
     match /simulations-momentum/{year} {
       // Only admins and investors can read simulations
       allow read: if canViewReports();
-      // Only admins can write simulations from frontend
-      allow write: if isAdmin();
+      // Admins and investors can write simulations from frontend
+      allow write: if canViewReports();
     }
     
     // Invitations collection
