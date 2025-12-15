@@ -161,6 +161,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Direct routes for strategies (2023-2025 period) */}
+          <Route path="/results" element={<ProtectedRoute><Results2025 /></ProtectedRoute>} />
+          <Route path="/results-momentum" element={<ProtectedRoute><ResultsMomentum2025 /></ProtectedRoute>} />
+          <Route path="/results-growth" element={<ProtectedRoute><ResultsGrowth2025 /></ProtectedRoute>} />
+          <Route path="/results-meanreversion" element={<ProtectedRoute><ResultsMeanReversion2025 /></ProtectedRoute>} />
+          <Route path="/results-breakout" element={<ProtectedRoute><ResultsBreakout2025 /></ProtectedRoute>} />
+          <Route path="/results-rsi" element={<ProtectedRoute><ResultsRSI2025 /></ProtectedRoute>} />
+          <Route path="/results-macd" element={<ProtectedRoute><ResultsMACD2025 /></ProtectedRoute>} />
+          <Route path="/results-volumeweighted" element={<ProtectedRoute><ResultsVolumeWeighted2025 /></ProtectedRoute>} />
+          <Route path="/results-pairs" element={<ProtectedRoute><ResultsPairs2025 /></ProtectedRoute>} />
+
           <Route
             path="/results-momentum/2025"
             element={
