@@ -471,7 +471,7 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
 
     // INSTITUCIONAL: Periodo completo 2023-2025 para todas las estrategias
     const startDate = '2023-01-01T00:00:00Z';
-    const endDate = '2025-12-11T23:59:59Z';
+    const endDate = '2025-12-15T23:59:59Z';
 
     // ============================================
     // PARÁMETROS PROFESIONALES
