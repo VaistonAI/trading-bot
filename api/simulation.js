@@ -406,8 +406,9 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
             else if (positions.has(symbol)) {
                 const position = positions.get(symbol);
 
-                // APLICAR SLIPPAGE EN VENTA (vendemos más barato)
-                const executionPrice = currentBar.c * (1 - SLIPPAGE_PERCENT / 100);
+                // INSTITUCIONAL: Slippage dinámico en venta
+                const slippagePercent = calculateDynamicSlippage(position.shares, avgVolume);
+                const executionPrice = bar.c * (1 - slippagePercent / 100);
                 const pnlPercent = ((executionPrice - position.entryPrice) / position.entryPrice) * 100;
 
                 // Vender si: señal SELL, stop-loss (-5%), o take-profit (+15%)
@@ -415,27 +416,40 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
                     const sellValue = position.shares * executionPrice;
                     const buyValue = position.shares * position.entryPrice;
 
-                    // P&L BRUTO (sin comisiones)
+                    // P&L BRUTO (sin fees)
                     const grossPnl = sellValue - buyValue;
 
-                    // P&L NETO (después de comisiones)
+                    // INSTITUCIONAL: Calcular fees regulatorios completos
+                    const regFees = calculateRegulatoryFees(sellValue, position.shares);
                     const sellCommission = COMMISSION_PER_TRADE;
-                    const totalTradeCommissions = position.buyCommission + sellCommission;
-                    const netPnl = grossPnl - totalTradeCommissions;
+                    const totalFees = position.buyCommission + sellCommission + regFees.total;
+                    const netPnl = grossPnl - totalFees;
 
-                    capital += sellValue - sellCommission;
-                    totalCommissions += sellCommission;
+                    capital += sellValue - sellCommission - regFees.total;
+                    totalCommissions += sellCommission + regFees.total;
                     positions.delete(symbol);
 
                     const trade = {
                         symbol,
-                        date,
-                        entryDate: position.entryDate,
+                        date: bar.t.split('T')[0],
+                        time: bar.t,
+                        entryDate: position.entryDate.split('T')[0],
+                        entryTime: position.entryDate,
                         entryPrice: position.entryPrice,
                         exitPrice: executionPrice,
                         shares: position.shares,
                         grossPnl: parseFloat(grossPnl.toFixed(2)),
-                        commissions: parseFloat(totalTradeCommissions.toFixed(2)),
+                        fees: {
+                            buyCommission: position.buyCommission,
+                            sellCommission: sellCommission,
+                            secFee: regFees.secFee,
+                            tafFee: regFees.tafFee,
+                            total: parseFloat(totalFees.toFixed(2))
+                        },
+                        slippage: {
+                            buy: position.slippage,
+                            sell: slippagePercent
+                        },
                         pnl: parseFloat(netPnl.toFixed(2)),
                         pnlPercent: parseFloat(pnlPercent.toFixed(2))
                     };
@@ -451,10 +465,10 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
                     }
 
                     // Actualizar desglose mensual
-                    const month = parseInt(date.split('-')[1]) - 1;
+                    const month = parseInt(trade.date.split('-')[1]) - 1;
                     monthlyBreakdown[month].trades++;
                     monthlyBreakdown[month].grossPnl += grossPnl;
-                    monthlyBreakdown[month].commissions += totalTradeCommissions;
+                    monthlyBreakdown[month].commissions += totalFees;
                     monthlyBreakdown[month].pnl += netPnl;
 
                     const reason = signal && signal.signal === 'SELL' ? 'SEÑAL' : (pnlPercent <= -5 ? 'STOP-LOSS' : 'TAKE-PROFIT');
