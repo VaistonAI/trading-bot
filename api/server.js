@@ -391,6 +391,18 @@ app.post('/api/simulations/run', async (req, res) => {
     }
 });
 
+app.get('/api/simulations/:year', async (req, res) => {
+    try {
+        const { year } = req.params;
+
+        // Return null if not cached (frontend will show "run simulation" button)
+        res.json(null);
+    } catch (error) {
+        console.error('Error getting simulation:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // ==========================================
 // TEST ENDPOINT
 // ==========================================
