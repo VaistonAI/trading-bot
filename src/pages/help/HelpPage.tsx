@@ -20,7 +20,7 @@ export const HelpPage: React.FC = () => {
                 <div className="mb-6">
                     <h2 className="text-3xl font-bold text-text-primary mb-2">Centro de Ayuda</h2>
                     <p className="text-text-secondary">
-                        Encuentra toda la información que necesitas para usar el CRM de manera efectiva
+                        Encuentra toda la información que necesitas para usar la plataforma de trading automatizado
                     </p>
                 </div>
 
@@ -71,87 +71,46 @@ const HowToUseSection: React.FC = () => (
         <h2 className="text-2xl font-bold text-text-primary mb-4">Cómo Usar el Sistema</h2>
 
         <div className="space-y-6">
-            <Section title="1. Gestión de Pacientes">
+            <Section title="1. Dashboard">
                 <p className="text-text-secondary mb-4">
-                    El módulo de pacientes te permite administrar toda la información de tus pacientes de manera centralizada.
+                    El Dashboard es tu centro de control principal donde visualizas el estado de tu cuenta y posiciones en tiempo real.
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                    <li><strong>Crear Paciente:</strong> Haz clic en "Nuevo Paciente" y completa el formulario con datos personales, contacto de emergencia y notas. Recibirás una notificación de confirmación.</li>
-                    <li><strong>Editar Paciente:</strong> Haz clic en el ícono de editar (lápiz) en la lista de pacientes para actualizar su información.</li>
-                    <li><strong>Buscar Paciente:</strong> Usa la barra de búsqueda para encontrar pacientes por nombre, email o teléfono.</li>
-                    <li><strong>Eliminar Paciente:</strong> Haz clic en el ícono de eliminar (basura) y confirma la acción. Se notificará la eliminación.</li>
-                    <li><strong>Ordenar y Filtrar:</strong> Ordena por nombre, email, teléfono o estado usando los encabezados de la tabla.</li>
+                    <li><strong>Valor de Cuenta:</strong> Visualiza el equity total de tu cuenta de trading en tiempo real.</li>
+                    <li><strong>Efectivo Disponible:</strong> Consulta el cash disponible para nuevas operaciones.</li>
+                    <li><strong>Posiciones Abiertas:</strong> Ve todas tus posiciones activas con P&L en tiempo real.</li>
+                    <li><strong>Métricas de Performance:</strong> ROI, ganancias/pérdidas totales y distribución de capital.</li>
+                    <li><strong>Actualización Automática:</strong> Los datos se actualizan automáticamente cada 10 segundos.</li>
                 </ul>
             </Section>
 
-            <Section title="2. Gestión de Consultorios">
+            <Section title="2. Trading en Vivo">
                 <p className="text-text-secondary mb-4">
-                    Administra los espacios físicos donde realizas las consultas.
+                    Controla el bot de trading automatizado y monitorea las operaciones en tiempo real.
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                    <li><strong>Crear Consultorio:</strong> Define nombre, dirección, capacidad, equipamiento disponible y notas adicionales.</li>
-                    <li><strong>Editar Consultorio:</strong> Actualiza la información según cambios en el espacio o equipamiento.</li>
-                    <li><strong>Eliminar Consultorio:</strong> Elimina consultorios que ya no uses. Recibirás una notificación de confirmación.</li>
-                    <li><strong>Buscar y Ordenar:</strong> Filtra por nombre, dirección o capacidad para encontrar rápidamente el consultorio que necesitas.</li>
+                    <li><strong>Iniciar Bot:</strong> Solo administradores pueden activar el bot de trading automático (requiere mercado abierto).</li>
+                    <li><strong>Pausar Bot:</strong> Detiene nuevas operaciones pero mantiene las posiciones abiertas.</li>
+                    <li><strong>Parada de Emergencia:</strong> Cierra TODAS las posiciones inmediatamente al precio de mercado.</li>
+                    <li><strong>Cerrar Posición Individual:</strong> Cierra una posición específica manualmente.</li>
+                    <li><strong>Horario de Mercado:</strong> El sistema solo permite operaciones durante NYSE/NASDAQ (9:30 AM - 4:00 PM EST).</li>
+                    <li><strong>Estrategia Automática:</strong> El bot ejecuta Value Investing con límites de seguridad predefinidos.</li>
                 </ul>
             </Section>
 
-            <Section title="3. Gestión de Consultas">
-                <p className="text-text-secondary mb-4">
-                    El módulo de Consultas unifica todo en un solo lugar: agenda, notas clínicas y cobro.
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                    <li><strong>Crear Consulta:</strong> Selecciona paciente, psicólogo, consultorio, fecha, hora y duración. Recibirás una notificación al crearla.</li>
-                    <li><strong>Registrar Notas:</strong> Durante o después de la consulta, registra motivo, diagnóstico, plan de tratamiento y objetivos para la próxima sesión.</li>
-                    <li><strong>Cobrar Consulta:</strong> Ingresa monto y método de pago. Se genera una factura automáticamente y recibirás notificación del pago.</li>
-                    <li><strong>Vista de Calendario:</strong> Visualiza todas tus consultas en formato de calendario mensual, semanal o diario.</li>
-                    <li><strong>Actualizar Estado:</strong> Marca consultas como programadas, en curso, completadas o canceladas.</li>
-                    <li><strong>Eliminar Consulta:</strong> Elimina consultas canceladas o erróneas. Se notificará la eliminación.</li>
-                </ul>
-            </Section>
-
-            <Section title="4. Facturación">
-                <p className="text-text-secondary mb-4">
-                    Gestiona los aspectos financieros de tu práctica con facturación automática.
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                    <li><strong>Facturas Automáticas:</strong> Se generan automáticamente al cobrar una consulta con número secuencial (FAC-001, FAC-002, etc.).</li>
-                    <li><strong>Crear Factura Manual:</strong> Crea facturas independientes para otros servicios. Recibirás notificación al crearla.</li>
-                    <li><strong>Editar Factura:</strong> Actualiza información de facturas pendientes antes de marcarlas como pagadas.</li>
-                    <li><strong>Registrar Pago:</strong> Marca facturas como pagadas ingresando monto y método de pago. Recibirás notificación del pago.</li>
-                    <li><strong>Eliminar Factura:</strong> Elimina facturas erróneas o canceladas. Se notificará la eliminación.</li>
-                    <li><strong>Ver Historial:</strong> Consulta todas las facturas pagadas y pendientes con totales por estado.</li>
-                    <li><strong>Buscar y Filtrar:</strong> Encuentra facturas por número, paciente, fecha, monto o estado.</li>
-                </ul>
-            </Section>
-
-            <Section title="5. Gestión de Usuarios">
+            <Section title="3. Gestión de Usuarios">
                 <p className="text-text-secondary mb-4">
                     Solo disponible para administradores. Gestiona los usuarios del sistema y sus permisos.
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                    <li><strong>Invitar Usuario:</strong> Envía invitaciones por email con enlace único que expira en 7 días. Recibirás notificación al enviarla.</li>
+                    <li><strong>Invitar Usuario:</strong> Envía invitaciones por email con enlace único que expira en 7 días.</li>
                     <li><strong>Compartir Invitación:</strong> Copia el enlace o compártelo directamente por WhatsApp.</li>
-                    <li><strong>Asignar Roles:</strong> Define roles al invitar: Administrador, Psicólogo, Recepcionista o Visualizador.</li>
-                    <li><strong>Editar Usuario:</strong> Actualiza nombre, email, rol o estado de usuarios existentes. Se notificará la actualización.</li>
+                    <li><strong>Asignar Roles:</strong> Define roles al invitar: Administrador o Inversionista.</li>
+                    <li><strong>Editar Usuario:</strong> Actualiza nombre, email, rol o estado de usuarios existentes.</li>
                     <li><strong>Activar/Desactivar:</strong> Controla el acceso de usuarios sin eliminar sus datos.</li>
-                    <li><strong>Eliminar Usuario:</strong> Elimina usuarios que ya no necesiten acceso. Recibirás notificación de la eliminación.</li>
-                    <li><strong>Revocar Invitación:</strong> Cancela invitaciones pendientes que ya no sean necesarias. Se notificará la revocación.</li>
+                    <li><strong>Eliminar Usuario:</strong> Elimina usuarios que ya no necesiten acceso.</li>
+                    <li><strong>Revocar Invitación:</strong> Cancela invitaciones pendientes que ya no sean necesarias.</li>
                     <li><strong>Ver Permisos:</strong> Consulta los permisos específicos de cada rol en el modal "Permisos por Rol".</li>
-                </ul>
-            </Section>
-
-            <Section title="6. Sistema de Notificaciones">
-                <p className="text-text-secondary mb-4">
-                    Mantente informado de todas las acciones importantes en el sistema.
-                </p>
-                <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                    <li><strong>Notificaciones en Tiempo Real:</strong> Recibe notificaciones instantáneas de todas las operaciones CRUD.</li>
-                    <li><strong>Campana de Notificaciones:</strong> El ícono de campana en el header muestra un contador de notificaciones no leídas.</li>
-                    <li><strong>Panel de Notificaciones:</strong> Haz clic en la campana para ver todas tus notificaciones pendientes.</li>
-                    <li><strong>Marcar como Leída:</strong> Haz clic en cualquier notificación para marcarla como leída y que desaparezca del panel.</li>
-                    <li><strong>Marcar Todas:</strong> Usa el botón "Marcar todas como leídas" para limpiar todas las notificaciones de una vez.</li>
-                    <li><strong>Tipos de Notificaciones:</strong> Pacientes, Consultorios, Consultas, Facturas, Pagos, Usuarios e Invitaciones.</li>
                 </ul>
             </Section>
         </div>
@@ -162,6 +121,34 @@ const HowItWorksSection: React.FC = () => (
     <div className="space-y-6">
         <h2 className="text-2xl font-bold text-text-primary mb-4">Cómo Funciona</h2>
 
+        <Section title="Sistema de Trading Automatizado">
+            <p className="text-text-secondary mb-4">
+                El bot ejecuta operaciones automáticamente basándose en la estrategia Value Investing:
+            </p>
+            <div className="bg-background rounded-lg p-4 space-y-3">
+                <div>
+                    <strong className="text-primary">Horario de Ejecución (Hora de México):</strong>
+                    <ul className="text-text-secondary text-sm mt-2 space-y-1">
+                        <li>• 8:30 AM - Apertura de mercado</li>
+                        <li>• 9:00 AM - 3:00 PM - Análisis cada hora (7 ejecuciones)</li>
+                        <li>• 3:00 PM - Cierre de mercado</li>
+                        <li>• 4:00 PM - Análisis post-mercado</li>
+                        <li>• Total: ~10 análisis diarios automáticos</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong className="text-primary">Límites de Seguridad:</strong>
+                    <ul className="text-text-secondary text-sm mt-2 space-y-1">
+                        <li>• Máximo 10% del capital por posición</li>
+                        <li>• Stop-loss automático: -5%</li>
+                        <li>• Take-profit automático: +15%</li>
+                        <li>• Máximo 10 posiciones simultáneas</li>
+                        <li>• Capital máximo: $10,000</li>
+                    </ul>
+                </div>
+            </div>
+        </Section>
+
         <Section title="Sistema de Permisos">
             <p className="text-text-secondary mb-4">
                 Cada usuario tiene un rol que determina sus permisos:
@@ -169,17 +156,25 @@ const HowItWorksSection: React.FC = () => (
             <div className="bg-background rounded-lg p-4 space-y-3">
                 <div>
                     <strong className="text-primary">Administrador:</strong>
-                    <p className="text-text-secondary text-sm">Acceso total al sistema, gestión de usuarios y configuración.</p>
+                    <p className="text-text-secondary text-sm">Control total: iniciar/pausar bot, gestión de usuarios, visualización completa.</p>
                 </div>
                 <div>
-                    <strong className="text-primary">Psicólogo:</strong>
-                    <p className="text-text-secondary text-sm">Gestión de pacientes, citas, sesiones, facturación y reportes.</p>
-                </div>
-                <div>
-                    <strong className="text-primary">Recepcionista:</strong>
-                    <p className="text-text-secondary text-sm">Gestión de pacientes, citas y facturación básica.</p>
+                    <strong className="text-primary">Inversionista:</strong>
+                    <p className="text-text-secondary text-sm">Solo visualización: Dashboard y posiciones en tiempo real (sin control del bot).</p>
                 </div>
             </div>
+        </Section>
+
+        <Section title="Conexión con Alpaca API">
+            <p className="text-text-secondary mb-4">
+                El sistema se conecta directamente con Alpaca Markets para ejecutar operaciones reales:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-text-secondary">
+                <li>Datos de mercado en tiempo real</li>
+                <li>Ejecución de órdenes automáticas</li>
+                <li>Gestión de posiciones y cuenta</li>
+                <li>Paper trading (simulación) o trading real</li>
+            </ul>
         </Section>
     </div>
 );
@@ -188,16 +183,29 @@ const WhySection: React.FC = () => (
     <div className="space-y-6">
         <h2 className="text-2xl font-bold text-text-primary mb-4">Por Qué Funciona Así</h2>
 
-        <Section title="Beneficios del Sistema">
+        <Section title="Beneficios del Trading Automatizado">
             <p className="text-text-secondary mb-4">
-                Ventajas de usar este CRM:
+                Ventajas de usar este sistema:
             </p>
             <ul className="list-disc list-inside space-y-2 text-text-secondary">
-                <li><strong>Centralización:</strong> Toda la información en un solo lugar.</li>
-                <li><strong>Accesibilidad:</strong> Accede desde cualquier dispositivo con internet.</li>
-                <li><strong>Seguridad:</strong> Datos encriptados y protegidos por Firebase.</li>
-                <li><strong>Escalabilidad:</strong> Crece con tu práctica sin necesidad de cambios.</li>
-                <li><strong>Actualizaciones:</strong> Mejoras continuas sin interrupciones.</li>
+                <li><strong>Eliminación de Emociones:</strong> El bot ejecuta la estrategia sin miedo ni codicia.</li>
+                <li><strong>Ejecución 24/7:</strong> Monitorea el mercado constantemente durante horas de trading.</li>
+                <li><strong>Disciplina Absoluta:</strong> Respeta siempre los stop-loss y take-profit definidos.</li>
+                <li><strong>Velocidad:</strong> Ejecuta operaciones en milisegundos, más rápido que cualquier humano.</li>
+                <li><strong>Backtesting:</strong> La estrategia está probada con datos históricos.</li>
+                <li><strong>Gestión de Riesgo:</strong> Límites automáticos para proteger el capital.</li>
+            </ul>
+        </Section>
+
+        <Section title="Por Qué Value Investing">
+            <p className="text-text-secondary mb-4">
+                La estrategia Value Investing se enfoca en:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-text-secondary">
+                <li>Comprar activos subvalorados por el mercado</li>
+                <li>Mantener posiciones a mediano plazo</li>
+                <li>Diversificación automática del portafolio</li>
+                <li>Análisis fundamental automatizado</li>
             </ul>
         </Section>
     </div>
@@ -209,58 +217,63 @@ const FAQSection: React.FC = () => (
 
         <div className="space-y-4">
             <FAQ
-                question="¿Cómo creo un nuevo paciente?"
-                answer="Ve al módulo 'Pacientes' en el sidebar, haz clic en 'Nuevo Paciente', completa el formulario con los datos requeridos (nombre, apellido, email, teléfono, fecha de nacimiento, dirección y contacto de emergencia) y haz clic en 'Crear'. Recibirás una notificación de confirmación y el paciente aparecerá inmediatamente en la lista."
+                question="¿Cómo inicio el bot de trading?"
+                answer="Solo los administradores pueden iniciar el bot. Ve a 'Trading en Vivo', asegúrate de que el mercado esté abierto (9:30 AM - 4:00 PM EST), y haz clic en 'Iniciar Bot'. El bot comenzará a analizar el mercado y ejecutar operaciones automáticamente según la estrategia Value Investing."
             />
 
             <FAQ
-                question="¿Cómo invito a un nuevo usuario al sistema?"
-                answer="Solo los administradores pueden invitar usuarios. Ve a 'Gestión de Usuarios', haz clic en 'Invitar Usuario', completa el formulario con nombre, email y rol (Administrador, Psicólogo, Recepcionista o Visualizador). Se generará un enlace único que expira en 7 días. Puedes copiarlo o compartirlo directamente por WhatsApp. Recibirás una notificación cuando la invitación sea enviada."
+                question="¿Qué pasa si el mercado está cerrado?"
+                answer="Los botones de control (Iniciar, Pausar, Parada de Emergencia, Cerrar Posición) están deshabilitados cuando el mercado está cerrado. El sistema muestra una alerta indicando el horario de operación: Lunes a Viernes, 9:30 AM - 4:00 PM EST (8:30 AM - 3:00 PM hora de México)."
             />
 
             <FAQ
-                question="¿Qué pasa si una invitación expira?"
-                answer="Las invitaciones expiran después de 7 días por seguridad. Si una invitación expira, simplemente crea una nueva invitación para el mismo usuario. También puedes revocar invitaciones pendientes que ya no necesites desde la lista de invitaciones."
+                question="¿Puedo cerrar una posición manualmente?"
+                answer="Sí, los administradores pueden cerrar posiciones individuales en cualquier momento durante horas de mercado. Ve a 'Trading en Vivo', encuentra la posición en la tabla y haz clic en 'Cerrar'. La posición se venderá al precio de mercado actual."
             />
 
             <FAQ
-                question="¿Cómo funciona el sistema de notificaciones?"
-                answer="El sistema envía notificaciones en tiempo real para todas las operaciones importantes: crear, actualizar o eliminar pacientes, consultorios, consultas, facturas, usuarios e invitaciones. También recibes notificaciones cuando se registran pagos. Las notificaciones aparecen en la campana del header con un contador. Haz clic en cualquier notificación para marcarla como leída, o usa 'Marcar todas como leídas' para limpiarlas todas."
+                question="¿Qué hace la Parada de Emergencia?"
+                answer="La Parada de Emergencia cierra TODAS las posiciones abiertas inmediatamente al precio de mercado y detiene el bot. Úsala solo en situaciones críticas. El sistema pedirá confirmación antes de ejecutarla."
             />
 
             <FAQ
-                question="¿Cómo funciona la facturación automática?"
-                answer="Cuando cobras una consulta, el sistema genera automáticamente una factura con número secuencial (FAC-001, FAC-002, etc.). La factura incluye los datos del paciente, monto, impuestos y método de pago. También puedes crear facturas manuales para otros servicios. Recibirás notificaciones al crear facturas y al registrar pagos."
+                question="¿Cómo invito a un nuevo usuario?"
+                answer="Solo los administradores pueden invitar usuarios. Ve a 'Usuarios', haz clic en 'Invitar Usuario', completa el formulario con nombre, email y rol (Administrador o Inversionista). Se generará un enlace único que expira en 7 días. Puedes copiarlo o compartirlo por WhatsApp."
             />
 
             <FAQ
-                question="¿Puedo editar una factura después de crearla?"
-                answer="Sí, puedes editar facturas que estén en estado 'Pendiente'. Una vez que una factura se marca como 'Pagada', no se puede editar para mantener la integridad del historial financiero. Si necesitas corregir una factura pagada, debes eliminarla y crear una nueva."
+                question="¿Qué diferencia hay entre Administrador e Inversionista?"
+                answer="Administrador: puede iniciar/pausar el bot, cerrar posiciones, gestionar usuarios y ver todo el sistema. Inversionista: solo puede visualizar el Dashboard y las posiciones en tiempo real, sin control sobre el bot ni gestión de usuarios."
             />
 
             <FAQ
-                question="¿Cómo registro el pago de una factura?"
-                answer="En el módulo 'Facturación', encuentra la factura pendiente y haz clic en el botón de pago (ícono de dólar). Ingresa el monto y método de pago. El sistema actualizará automáticamente el estado de la factura a 'Pagada' y recibirás una notificación de confirmación."
+                question="¿Los datos se actualizan en tiempo real?"
+                answer="Sí, tanto el Dashboard como Trading en Vivo se actualizan automáticamente cada 10 segundos con datos en tiempo real de Alpaca API. No necesitas recargar la página manualmente."
             />
 
             <FAQ
-                question="¿Puedo eliminar una consulta programada?"
-                answer="Sí, puedes eliminar consultas desde el módulo 'Consultas'. Sin embargo, es recomendable cambiar el estado a 'Cancelada' en lugar de eliminarla para mantener un historial completo. Al eliminar una consulta, recibirás una notificación de confirmación."
+                question="¿Qué es Alpaca API?"
+                answer="Alpaca es un broker regulado en EE.UU. que proporciona API para trading automatizado. El sistema se conecta a Alpaca para obtener datos de mercado en tiempo real y ejecutar operaciones. Puedes usar paper trading (simulación) o trading real."
             />
 
             <FAQ
-                question="¿Cómo veo el historial de un paciente?"
-                answer="En el módulo 'Consultas', puedes filtrar por paciente para ver todas sus consultas pasadas y futuras. Cada consulta muestra las notas clínicas, diagnóstico, plan de tratamiento y estado de pago. También puedes ver las facturas asociadas en el módulo 'Facturación'."
+                question="¿Cuánto capital necesito para empezar?"
+                answer="Para paper trading (simulación): $0, Alpaca te da $100,000 virtuales. Para trading real: mínimo recomendado $1,000 USD. El sistema tiene límites de seguridad: máximo 20% del capital por posición y máximo 5 posiciones simultáneas."
             />
 
             <FAQ
-                question="¿Qué diferencia hay entre los roles de usuario?"
-                answer="Administrador: acceso total al sistema, gestión de usuarios y configuración. Psicólogo: gestión de pacientes, consultas, notas clínicas y facturación. Recepcionista: gestión de citas, pacientes y consultorios (sin acceso a notas clínicas). Visualizador: solo lectura de información sin capacidad de edición. Puedes ver los permisos detallados en el modal 'Permisos por Rol' en Gestión de Usuarios."
+                question="¿El bot opera en fines de semana?"
+                answer="No, el mercado de valores NYSE/NASDAQ solo opera de Lunes a Viernes. El bot no ejecuta operaciones en fines de semana ni días festivos. Sin embargo, puedes ver tus posiciones y el Dashboard en cualquier momento."
+            />
+
+            <FAQ
+                question="¿Puedo cambiar la estrategia del bot?"
+                answer="Actualmente el bot usa una estrategia Value Investing predefinida con límites de seguridad fijos. Para modificar la estrategia o los parámetros, necesitas acceso al código fuente del sistema."
             />
 
             <FAQ
                 question="¿Los datos están seguros?"
-                answer="Sí, todos los datos están almacenados en Firebase con encriptación en tránsito y en reposo. Las reglas de seguridad de Firestore garantizan que cada usuario solo pueda acceder a los datos para los que tiene permisos. Además, las notificaciones son privadas y solo visibles para el usuario que las genera."
+                answer="Sí, todos los datos están almacenados en Firebase con encriptación. Las credenciales de Alpaca se almacenan de forma segura en variables de entorno. El sistema usa HTTPS para todas las comunicaciones."
             />
 
             <FAQ
@@ -271,21 +284,6 @@ const FAQSection: React.FC = () => (
             <FAQ
                 question="¿Qué hago si olvidé mi contraseña?"
                 answer="En la pantalla de login, haz clic en 'Olvidé mi contraseña' y sigue las instrucciones para restablecerla mediante tu correo electrónico. Recibirás un enlace de Firebase para crear una nueva contraseña."
-            />
-
-            <FAQ
-                question="¿Puedo buscar y filtrar información?"
-                answer="Sí, todos los módulos principales (Pacientes, Consultorios, Consultas, Facturas, Usuarios) tienen barras de búsqueda y opciones de ordenamiento. Puedes buscar por nombre, email, fecha, número de factura, etc. También puedes ordenar las listas haciendo clic en los encabezados de las columnas."
-            />
-
-            <FAQ
-                question="¿El sistema hace backups automáticos?"
-                answer="Sí, Firebase realiza backups automáticos diarios de toda la base de datos. Tus datos están protegidos contra pérdidas. Además, cada operación queda registrada con fecha y usuario que la realizó para trazabilidad completa."
-            />
-
-            <FAQ
-                question="¿Las notificaciones se eliminan automáticamente?"
-                answer="No, las notificaciones permanecen hasta que las marques como leídas. Puedes marcarlas individualmente haciendo clic en ellas, o usar el botón 'Marcar todas como leídas' para limpiar todas las notificaciones de una vez. Esto te permite revisar las notificaciones a tu propio ritmo."
             />
         </div>
     </div>

@@ -18,6 +18,7 @@ import { SectorRotationStrategy } from './pages/strategies/SectorRotationStrateg
 import { Simulation } from './pages/simulation/Simulation';
 import { Research } from './pages/research/Research';
 import { LiveTrading } from './pages/trading/LiveTrading';
+import { DailyReports } from './pages/reports/DailyReports';
 import { UserManagement } from './pages/users/UserManagement';
 import { HelpPage } from './pages/help/HelpPage';
 
@@ -89,6 +90,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Simulation />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <DailyReports />
               </ProtectedRoute>
             }
           />

@@ -335,6 +335,33 @@ app.get('/api/research/top-performers', async (req, res) => {
 });
 
 // ==========================================
+// DAILY REPORTS ENDPOINT
+// ==========================================
+
+app.get('/api/reports/daily', async (req, res) => {
+    try {
+        // Fetch reports from Firebase
+        const reportsSnapshot = await db.collection('dailyReports')
+            .orderBy('date', 'desc')
+            .limit(100)
+            .get();
+
+        const reports = [];
+        reportsSnapshot.forEach(doc => {
+            reports.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        res.json(reports);
+    } catch (error) {
+        console.error('Error fetching daily reports:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==========================================
 // TEST ENDPOINT
 // ==========================================
 

@@ -29,7 +29,7 @@ export const Research: React.FC = () => {
         setProgress(null);
 
         try {
-            const response = await fetch('http://localhost:3001/api/research/top-performers?years=5&limit=20');
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/research/top-performers?years=5&limit=20`);
 
             const reader = response.body?.getReader();
             const decoder = new TextDecoder();

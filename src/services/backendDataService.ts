@@ -3,7 +3,7 @@
  * SIN CACHÉ - Todos los datos son siempre frescos y precisos
  */
 
-const BACKEND_URL = 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export interface AccountData {
     equity: string;

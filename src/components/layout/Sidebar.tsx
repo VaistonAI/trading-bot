@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import {
     FaHome,
     FaChartBar,
+    FaChartLine,
     FaUsersCog,
     FaBars,
     FaTimes,
@@ -283,6 +284,12 @@ export const Sidebar: React.FC = () => {
             permission: 'canViewStrategies'
         },
         {
+            path: '/reports',
+            label: 'Reportes Diarios',
+            icon: <FaChartLine />,
+            permission: 'canViewStrategies'
+        },
+        {
             path: '/users',
             label: 'Usuarios',
             icon: <FaUsersCog />,
@@ -354,7 +361,7 @@ export const Sidebar: React.FC = () => {
                             alt="Vaiston Logo"
                             className="h-12 w-auto drop-shadow-lg"
                         />
-                        <p className="text-xs text-white/80 mt-2 font-medium">CRM para Psicólogos</p>
+                        <p className="text-xs text-white/80 mt-2 font-medium">Trading Automatizado</p>
                     </div>
 
                     {/* Menu */}

@@ -6,6 +6,8 @@ import { SuccessModal } from '../../components/ui/SuccessModal';
 import { AlertModal } from '../../components/ui/AlertModal';
 import { ConfirmModal } from '../../components/ui/ConfirmModal';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 interface Position {
     asset_id: string;
     symbol: string;
@@ -38,6 +40,8 @@ export const LiveTrading: React.FC = () => {
     const [modalMessage, setModalMessage] = useState({ title: '', message: '' });
     const [positionToClose, setPositionToClose] = useState<string | null>(null);
     const [isMarketOpen, setIsMarketOpen] = useState(false);
+    const [nextExecutionTime, setNextExecutionTime] = useState<string>('');
+    const [timeUntilNext, setTimeUntilNext] = useState<string>('');
 
     // Helper functions para mostrar modales
     const showSuccess = (message: string) => {
@@ -66,6 +70,42 @@ export const LiveTrading: React.FC = () => {
         const isDuringMarketHours = currentTime >= marketOpen && currentTime < marketClose;
 
         return isWeekday && isDuringMarketHours;
+    };
+
+    // Calcular próxima ejecución
+    const getNextExecutionTime = () => {
+        const now = new Date();
+        const mexicoTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Mexico_City' }));
+        const currentHour = mexicoTime.getHours();
+        const currentMinute = mexicoTime.getMinutes();
+        const currentTime = currentHour * 60 + currentMinute;
+
+        // Horarios de ejecución en minutos desde medianoche (hora de México)
+        const executionTimes = [
+            { time: 8 * 60 + 30, label: '8:30 AM' },   // 8:30 AM
+            { time: 9 * 60, label: '9:00 AM' },        // 9:00 AM
+            { time: 10 * 60, label: '10:00 AM' },      // 10:00 AM
+            { time: 11 * 60, label: '11:00 AM' },      // 11:00 AM
+            { time: 12 * 60, label: '12:00 PM' },      // 12:00 PM
+            { time: 13 * 60, label: '1:00 PM' },       // 1:00 PM
+            { time: 14 * 60, label: '2:00 PM' },       // 2:00 PM
+            { time: 15 * 60, label: '3:00 PM' },       // 3:00 PM
+            { time: 16 * 60, label: '4:00 PM' }        // 4:00 PM
+        ];
+
+        // Encontrar próxima ejecución
+        for (const exec of executionTimes) {
+            if (currentTime < exec.time) {
+                const minutesUntil = exec.time - currentTime;
+                const hours = Math.floor(minutesUntil / 60);
+                const minutes = minutesUntil % 60;
+                const timeStr = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+                return { next: exec.label, until: timeStr };
+            }
+        }
+
+        // Si ya pasaron todas las ejecuciones de hoy, mostrar primera de mañana
+        return { next: 'Mañana 8:30 AM', until: 'Mercado cerrado' };
     };
 
     // Mostrar loading mientras se carga la autenticación
@@ -101,7 +141,7 @@ export const LiveTrading: React.FC = () => {
     // Cargar cuenta de Alpaca
     const loadAccount = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/trading/account');
+            const response = await fetch(`${API_URL}/api/trading/account`);
             if (response.ok) {
                 const data = await response.json();
                 setAccount(data);
@@ -116,7 +156,7 @@ export const LiveTrading: React.FC = () => {
         if (!firebaseUser) return;
 
         try {
-            const response = await fetch(`http://localhost:3001/api/trading/positions?userId=${firebaseUser.uid}`);
+            const response = await fetch(`${API_URL}/api/trading/positions?userId=${firebaseUser.uid}`);
             if (response.ok) {
                 const data = await response.json();
                 setPositions(data);
@@ -132,6 +172,19 @@ export const LiveTrading: React.FC = () => {
         const interval = setInterval(() => {
             setIsMarketOpen(checkMarketHours());
         }, 60000); // Verificar cada minuto
+        return () => clearInterval(interval);
+    }, []);
+
+    // Actualizar contador regresivo cada segundo
+    useEffect(() => {
+        const updateCountdown = () => {
+            const { next, until } = getNextExecutionTime();
+            setNextExecutionTime(next);
+            setTimeUntilNext(until);
+        };
+
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000); // Actualizar cada segundo
         return () => clearInterval(interval);
     }, []);
 
@@ -151,7 +204,7 @@ export const LiveTrading: React.FC = () => {
         const checkBotStatus = async () => {
             if (!firebaseUser) return;
             try {
-                const response = await fetch(`http://localhost:3001/api/trading/status?userId=${firebaseUser.uid}`);
+                const response = await fetch(`${API_URL}/api/trading/status?userId=${firebaseUser.uid}`);
                 if (response.ok) {
                     const data = await response.json();
                     setBotActive(data.botActive || false);
@@ -186,13 +239,13 @@ export const LiveTrading: React.FC = () => {
         try {
             const requestBody = {
                 userId: firebaseUser.uid,
-                capital: 1000,
+                capital: 10000,
                 symbols: ['SPY', 'SLV', 'XLF', 'QQQ', 'IWM', 'HYG', 'NVDA', 'TQQQ', 'SOXL', 'AVGO', 'ONDS', 'WULF', 'INTC', 'TE', 'DNN', 'FEIM', 'BBAI', 'BMNR']
             };
 
             console.log('5. Request body:', JSON.stringify(requestBody, null, 2));
 
-            const response = await fetch('http://localhost:3001/api/trading/start', {
+            const response = await fetch(`${API_URL}/api/trading/start`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
@@ -225,7 +278,7 @@ export const LiveTrading: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3001/api/trading/stop', {
+            const response = await fetch(`${API_URL}/api/trading/stop`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: firebaseUser.uid })
@@ -250,7 +303,7 @@ export const LiveTrading: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3001/api/trading/emergency-stop', {
+            const response = await fetch(`${API_URL}/api/trading/emergency-stop`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: firebaseUser.uid })
@@ -281,7 +334,7 @@ export const LiveTrading: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch(`http://localhost:3001/api/trading/close-position/${positionToClose}`, {
+            const response = await fetch(`${API_URL}/api/trading/close-position/${positionToClose}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: firebaseUser.uid })
@@ -362,15 +415,28 @@ export const LiveTrading: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Market Hours Info */}
-                {!isMarketOpen && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <p className="text-sm text-yellow-800">
-                            ⚠️ <strong>Mercado Cerrado:</strong> El mercado de valores opera de Lunes a Viernes, 9:30 AM - 4:00 PM EST (8:30 AM - 3:00 PM hora de México).
-                            Las operaciones de compra/venta solo están disponibles durante el horario de mercado.
-                        </p>
-                    </div>
-                )}
+                {/* Market Status Info */}
+                <div className={`${isMarketOpen ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'} border rounded-lg p-4`}>
+                    <p className={`${isMarketOpen ? 'text-green-800' : 'text-yellow-800'} font-semibold mb-2`}>
+                        {isMarketOpen ? '✅ Mercado Abierto' : '⚠️ Mercado Cerrado'}
+                    </p>
+                    <p className={`text-sm ${isMarketOpen ? 'text-green-700' : 'text-yellow-700'}`}>
+                        {isMarketOpen
+                            ? 'El mercado de valores opera de Lunes a Viernes, 9:30 AM - 4:00 PM EST (8:30 AM - 3:00 PM hora de México).'
+                            : 'El mercado de valores opera de Lunes a Viernes, 9:30 AM - 4:00 PM EST (8:30 AM - 3:00 PM hora de México). Las operaciones de compra/venta solo están disponibles durante el horario de mercado.'
+                        }
+                    </p>
+                    {isMarketOpen && botActive && (
+                        <div className="mt-3 pt-3 border-t border-green-200">
+                            <p className="text-sm text-green-800">
+                                <strong>Próximo análisis:</strong> {nextExecutionTime}
+                            </p>
+                            <p className="text-sm text-green-700 mt-1">
+                                <strong>Tiempo restante:</strong> {timeUntilNext}
+                            </p>
+                        </div>
+                    )}
+                </div>
 
                 {/* Métricas Principales */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

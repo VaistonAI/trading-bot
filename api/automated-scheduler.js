@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const { TradingBot } = require('./trading-bot');
+const { admin, db } = require('./firebase-admin');
 
 // Símbolos a monitorear
 const SYMBOLS = [
@@ -14,6 +15,17 @@ class AutomatedTradingScheduler {
         this.isRunning = false;
         this.lastExecution = null;
         this.executionLog = [];
+
+        // Tracking diario para reportes
+        this.dailyMetrics = {
+            date: new Date().toISOString().split('T')[0],
+            tradesExecuted: 0,
+            positionsOpened: 0,
+            positionsClosed: 0,
+            capitalStart: 10000,
+            capitalEnd: 10000,
+            totalPnL: 0
+        };
     }
 
     /**
@@ -62,6 +74,15 @@ class AutomatedTradingScheduler {
             timezone: "America/Mexico_City"
         });
 
+        // Generación de reporte diario (4:15 PM)
+        this.dailyReportJob = cron.schedule('15 16 * * 1-5', async () => {
+            console.log('📋 GENERANDO REPORTE DIARIO...');
+            await this.generateDailyReport();
+        }, {
+            scheduled: true,
+            timezone: "America/Mexico_City"
+        });
+
         this.isRunning = true;
         console.log('✅ Trading automático activado para Bolsa Mexicana (BMV)');
         console.log('📅 Horarios (Hora de México):');
@@ -87,6 +108,9 @@ class AutomatedTradingScheduler {
         }
         if (this.postMarketJob) {
             this.postMarketJob.stop();
+        }
+        if (this.dailyReportJob) {
+            this.dailyReportJob.stop();
         }
         this.isRunning = false;
         console.log('🛑 Trading automático detenido');
@@ -154,12 +178,84 @@ class AutomatedTradingScheduler {
         this.lastExecution = execution;
         this.executionLog.push(execution);
 
+        // Actualizar métricas diarias
+        if (execution.trades && execution.trades.length > 0) {
+            this.dailyMetrics.tradesExecuted += execution.trades.length;
+            // Contar posiciones abiertas/cerradas
+            execution.trades.forEach(trade => {
+                if (trade.side === 'buy') this.dailyMetrics.positionsOpened++;
+                if (trade.side === 'sell') this.dailyMetrics.positionsClosed++;
+            });
+        }
+
         // Mantener solo las últimas 100 ejecuciones
         if (this.executionLog.length > 100) {
             this.executionLog = this.executionLog.slice(-100);
         }
 
         return execution;
+    }
+
+    /**
+     * Genera el reporte diario y lo guarda en Firebase
+     */
+    async generateDailyReport() {
+        try {
+            console.log('\n' + '='.repeat(60));
+            console.log('📋 GENERANDO REPORTE DIARIO');
+            console.log('='.repeat(60));
+
+            // Obtener capital actual de Alpaca
+            try {
+                const account = await this.tradingBot.getAccount();
+                this.dailyMetrics.capitalEnd = parseFloat(account.equity);
+                this.dailyMetrics.totalPnL = this.dailyMetrics.capitalEnd - this.dailyMetrics.capitalStart;
+            } catch (error) {
+                console.error('Error obteniendo capital:', error.message);
+            }
+
+            const roi = ((this.dailyMetrics.capitalEnd - this.dailyMetrics.capitalStart) / this.dailyMetrics.capitalStart) * 100;
+
+            const report = {
+                date: this.dailyMetrics.date,
+                tradesExecuted: this.dailyMetrics.tradesExecuted,
+                totalPnL: this.dailyMetrics.totalPnL,
+                positionsOpened: this.dailyMetrics.positionsOpened,
+                positionsClosed: this.dailyMetrics.positionsClosed,
+                roi: roi,
+                capitalStart: this.dailyMetrics.capitalStart,
+                capitalEnd: this.dailyMetrics.capitalEnd,
+                createdAt: admin.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Guardar en Firebase
+            await db.collection('dailyReports').add(report);
+
+            console.log('✅ Reporte guardado en Firebase:');
+            console.log(`   Fecha: ${report.date}`);
+            console.log(`   Operaciones: ${report.tradesExecuted}`);
+            console.log(`   P&L: $${report.totalPnL.toFixed(2)}`);
+            console.log(`   ROI: ${report.roi.toFixed(2)}%`);
+            console.log('='.repeat(60) + '\n');
+
+            // Resetear métricas para el siguiente día
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            this.dailyMetrics = {
+                date: tomorrow.toISOString().split('T')[0],
+                tradesExecuted: 0,
+                positionsOpened: 0,
+                positionsClosed: 0,
+                capitalStart: this.dailyMetrics.capitalEnd,
+                capitalEnd: this.dailyMetrics.capitalEnd,
+                totalPnL: 0
+            };
+
+            return report;
+        } catch (error) {
+            console.error('❌ Error generando reporte diario:', error);
+            throw error;
+        }
     }
 
     /**

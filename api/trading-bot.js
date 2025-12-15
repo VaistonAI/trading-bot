@@ -2,11 +2,11 @@ const fetch = require('node-fetch');
 
 // Configuración
 const ALPACA_PAPER_URL = 'https://paper-api.alpaca.markets';
-const MAX_CAPITAL = 1000; // Límite de seguridad
-const MAX_POSITIONS = 5;
+const MAX_CAPITAL = 10000; // Límite de seguridad
+const MAX_POSITIONS = 10;
 const STOP_LOSS_PERCENT = -5;
 const TAKE_PROFIT_PERCENT = 15;
-const POSITION_SIZE = MAX_CAPITAL / MAX_POSITIONS; // $200 por posición
+const POSITION_SIZE = MAX_CAPITAL / MAX_POSITIONS; // $1000 por posición
 
 /**
  * TRADING BOT - Value Investing Strategy
