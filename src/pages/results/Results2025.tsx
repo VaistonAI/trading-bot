@@ -253,7 +253,14 @@ export const Results2025 = () => {
                                     </thead>
                                     <tbody>
                                         {results.monthlyBreakdown
-                                            .filter(month => month.year === selectedYear)
+                                            .filter(month => {
+                                                // Si tiene propiedad 'year', usar el nuevo formato
+                                                if ('year' in month) {
+                                                    return month.year === selectedYear;
+                                                }
+                                                // Fallback: datos antiguos (12 meses sin año)
+                                                return selectedYear === 2025;
+                                            })
                                             .map((month, idx) => (
                                                 <tr key={idx} className="border-t border-gray-100">
                                                     <td className="py-3 px-4 text-text-primary">{month.month}</td>
