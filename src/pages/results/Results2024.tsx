@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { FaChartArea, FaPlay, FaCheckCircle, FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import { db } from '../../config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
 
 interface SimulationResult {
     year: number;
@@ -34,11 +32,13 @@ export const Results2024: React.FC = () => {
     const loadResults = async () => {
         try {
             setIsLoading(true);
-            const docRef = doc(db, 'simulations', '2024');
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                setResults(docSnap.data() as SimulationResult);
+            // Try to get cached results from backend
+            const response = await fetch(`${API_URL}/api/simulations/2024`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data) {
+                    setResults(data);
+                }
             }
         } catch (error) {
             console.error('Error loading results:', error);
@@ -105,8 +105,8 @@ export const Results2024: React.FC = () => {
                             onClick={runSimulation}
                             disabled={isRunning}
                             className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isRunning
-                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                    : 'bg-primary text-white hover:bg-primary-dark'
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                : 'bg-primary text-white hover:bg-primary-dark'
                                 }`}
                         >
                             <FaPlay />

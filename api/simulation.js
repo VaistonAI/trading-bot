@@ -1,12 +1,21 @@
 const fetch = require('node-fetch');
-const { admin, db } = require('./firebase-admin');
 
 const ALPACA_PAPER_URL = 'https://paper-api.alpaca.markets';
+
+// In-memory storage for simulations
+const simulationCache = new Map();
 
 /**
  * Ejecuta una simulación de backtesting para un año específico
  */
 async function runSimulation(year, strategy, symbols, initialCapital, alpacaHeaders) {
+    // Check if already cached
+    const cacheKey = `${year}-${strategy}`;
+    if (simulationCache.has(cacheKey)) {
+        console.log(`📦 Returning cached simulation for ${year}`);
+        return simulationCache.get(cacheKey);
+    }
+
     console.log(`\n🔄 Iniciando simulación para ${year}...`);
     console.log(`   Estrategia: ${strategy}`);
     console.log(`   Capital inicial: $${initialCapital}`);
@@ -87,12 +96,11 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         worstTrade,
         monthlyBreakdown,
         trades,
-        ranAt: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        ranAt: new Date().toISOString()
     };
 
-    // Guardar en Firebase
-    await db.collection('simulations').doc(year.toString()).set(results);
+    // Cache the results
+    simulationCache.set(cacheKey, results);
 
     console.log(`✅ Simulación completada:`);
     console.log(`   Total P&L: $${totalPnL.toFixed(2)}`);
