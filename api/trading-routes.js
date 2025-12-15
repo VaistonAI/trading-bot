@@ -12,15 +12,15 @@ function setupTradingRoutes(app, getAlpacaHeaders) {
     // Iniciar bot de trading
     app.post('/api/trading/start', async (req, res) => {
         try {
-            const { userId, capital = 1000, symbols } = req.body;
+            const { userId, capital = 10000, symbols } = req.body;
 
             if (!userId) {
                 return res.status(400).json({ error: 'userId required' });
             }
 
             // Verificar límite de capital
-            if (capital > 1000) {
-                return res.status(400).json({ error: 'Capital exceeds $1,000 limit' });
+            if (capital > 10000) {
+                return res.status(400).json({ error: 'Capital exceeds $10,000 limit' });
             }
 
             // Crear bot para este usuario
