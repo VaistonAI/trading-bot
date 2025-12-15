@@ -6,6 +6,7 @@ import {
     FaHome,
     FaChartBar,
     FaChartLine,
+    FaChartArea,
     FaUsersCog,
     FaBars,
     FaTimes,
@@ -287,6 +288,12 @@ export const Sidebar: React.FC = () => {
             path: '/reports',
             label: 'Reportes Diarios',
             icon: <FaChartLine />,
+            permission: 'canViewStrategies'
+        },
+        {
+            path: '/results/2024',
+            label: 'Resultados',
+            icon: <FaChartArea />,
             permission: 'canViewStrategies'
         },
         {

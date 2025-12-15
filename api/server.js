@@ -362,6 +362,36 @@ app.get('/api/reports/daily', async (req, res) => {
 });
 
 // ==========================================
+// SIMULATION ENDPOINT
+// ==========================================
+
+const { runSimulation } = require('./simulation');
+
+app.post('/api/simulations/run', async (req, res) => {
+    try {
+        const { year, strategy, symbols, initialCapital } = req.body;
+
+        if (!year || !symbols || !initialCapital) {
+            return res.status(400).json({ error: 'Missing required parameters' });
+        }
+
+        // Ejecutar simulación
+        const results = await runSimulation(
+            year,
+            strategy || 'value',
+            symbols,
+            initialCapital,
+            getAlpacaHeaders()
+        );
+
+        res.json(results);
+    } catch (error) {
+        console.error('Error running simulation:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ==========================================
 // TEST ENDPOINT
 // ==========================================
 
