@@ -118,10 +118,9 @@ export const Results2024: React.FC = () => {
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h2 className="text-3xl font-bold text-text-primary mb-2 flex items-center gap-3">
-                            <FaChartArea className="text-primary" />
+                        <h1 className="text-3xl font-bold text-text-primary mb-2">
                             Resultados 2024
-                        </h2>
+                        </h1>
                         <p className="text-text-secondary">
                             Simulación histórica de la estrategia Value Investing en 2024
                         </p>
@@ -132,8 +131,8 @@ export const Results2024: React.FC = () => {
                                 onClick={runSimulation}
                                 disabled={isRunning}
                                 className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isRunning
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-primary text-white hover:bg-primary-dark'
+                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                    : 'bg-primary text-white hover:bg-primary-dark'
                                     }`}
                             >
                                 <FaPlay />
@@ -145,8 +144,8 @@ export const Results2024: React.FC = () => {
                                 onClick={saveToFirebase}
                                 disabled={isSaving}
                                 className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isSaving
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-green-600 text-white hover:bg-green-700'
+                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                    : 'bg-green-600 text-white hover:bg-green-700'
                                     }`}
                             >
                                 <FaCheckCircle />
