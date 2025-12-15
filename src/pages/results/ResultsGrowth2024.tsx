@@ -84,7 +84,7 @@ export const ResultsGrowth2024 = () => {
 
         try {
             setIsSaving(true);
-            const docRef = doc(db, 'simulations-momentum', results.year.toString());
+            const docRef = doc(db, 'simulations-growth', '2024');
             await setDoc(docRef, {
                 ...results,
                 ranAt: new Date().toISOString(),
