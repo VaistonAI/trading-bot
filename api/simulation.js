@@ -55,7 +55,8 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
     console.log(`   Símbolos: ${symbols.length}`);
 
     const startDate = `${year}-01-01T00:00:00Z`;
-    const endDate = `${year}-12-31T23:59:59Z`;
+    // Para 2025, usar hasta el 14 de diciembre; para otros años, usar 31 de diciembre
+    const endDate = year === 2025 ? `${year}-12-14T23:59:59Z` : `${year}-12-31T23:59:59Z`;
 
     let capital = initialCapital;
     const trades = [];
