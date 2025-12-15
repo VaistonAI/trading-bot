@@ -23,6 +23,9 @@ import { Results2025 } from './pages/results/Results2025';
 import { Results2024 } from './pages/results/Results2024';
 import { Results2023 } from './pages/results/Results2023';
 import { Results2022 } from './pages/results/Results2022';
+import { ResultsMomentum2025 } from './pages/results/ResultsMomentum2025';
+import { ResultsMomentum2024 } from './pages/results/ResultsMomentum2024';
+import { ResultsMomentum2023 } from './pages/results/ResultsMomentum2023';
 import { UserManagement } from './pages/users/UserManagement';
 import { HelpPage } from './pages/help/HelpPage';
 
