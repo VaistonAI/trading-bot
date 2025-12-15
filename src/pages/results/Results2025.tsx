@@ -203,9 +203,9 @@ export const Results2025 = () => {
                                     <FaArrowUp className="text-green-600" />
                                     <h3 className="text-lg font-semibold text-text-primary">Mejor Trade</h3>
                                 </div>
-                                <p className="text-2xl font-bold text-text-primary mb-1">{results.bestTrade.symbol}</p>
+                                <p className="text-2xl font-bold text-text-primary mb-1">{results.bestTrade?.symbol || 'N/A'}</p>
                                 <p className="text-xl font-semibold text-green-600">
-                                    +${results.bestTrade.pnl.toFixed(2)}
+                                    +${results.bestTrade?.pnl?.toFixed(2) || '0.00'}
                                 </p>
                             </div>
 
@@ -214,9 +214,9 @@ export const Results2025 = () => {
                                     <FaArrowDown className="text-red-600" />
                                     <h3 className="text-lg font-semibold text-text-primary">Peor Trade</h3>
                                 </div>
-                                <p className="text-2xl font-bold text-text-primary mb-1">{results.worstTrade.symbol}</p>
+                                <p className="text-2xl font-bold text-text-primary mb-1">{results.worstTrade?.symbol || 'N/A'}</p>
                                 <p className="text-xl font-semibold text-red-600">
-                                    ${results.worstTrade.pnl.toFixed(2)}
+                                    ${results.worstTrade?.pnl?.toFixed(2) || '0.00'}
                                 </p>
                             </div>
                         </div>
