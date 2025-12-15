@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { MainLayout } from '../../components/layout/MainLayout';
 import { FaChartArea, FaPlay, FaCheckCircle, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { db } from '../../config/firebase';
@@ -118,7 +118,7 @@ export const ResultsMeanReversion2025 = () => {
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-text-primary mb-2">
-                            R Mean Reversion 2025
+                            R Mean Reversion (2023-2025)
                         </h1>
                         <p className="text-text-secondary">
                             Simulación histórica de la estrategia Mean Reversion en 2025 (YTD: Ene 1 - Dic 14)

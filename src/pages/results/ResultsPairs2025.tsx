@@ -118,10 +118,10 @@ export const ResultsPairs2025 = () => {
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-text-primary mb-2">
-                            R Pairs Trading 2025
+                            R Pairs Trading (2023-2025)
                         </h1>
                         <p className="text-text-secondary">
-                            SimulaciÃ³n histÃ³rica de la estrategia Pairs Trading en 2025 (YTD: Ene 1 - Dic 14)
+                            Backtesting institucional: 01 Enero 2023 - 11 Diciembre 2025
                         </p>
                     </div>
                     <div className="flex gap-3">
@@ -264,7 +264,7 @@ export const ResultsPairs2025 = () => {
                             No hay resultados disponibles
                         </h3>
                         <p className="text-text-secondary mb-6">
-                            Ejecuta la simulaciÃ³n para ver el rendimiento de la estrategia Pairs Trading en 2025
+                            Ejecuta la simulaciÃ³n para ver el rendimiento profesional de la estrategia Pairs Trading (2023-2025)
                         </p>
                     </div>
                 )}

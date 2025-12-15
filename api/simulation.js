@@ -458,19 +458,20 @@ function calculateProfessionalMetrics(trades, initialCapital, finalCapital) {
 }
 
 /**
- * Ejecuta una simulación de backtesting INSTITUCIONAL para un año específico
+ * Ejecuta una simulación de backtesting INSTITUCIONAL para periodo completo 2023-2025
  * INCLUYE: Datos intraday, Horarios de mercado, Fees completos, Market impact, Métricas profesionales
  */
 async function runSimulation(year, strategy, symbols, initialCapital, alpacaHeaders) {
     console.log(`\n🔄 ============================================`);
-    console.log(`   BACKTESTING PROFESIONAL ${year}`);
+    console.log(`   BACKTESTING PROFESIONAL 2023-2025`);
     console.log(`   ============================================`);
     console.log(`   Estrategia: ${strategy.toUpperCase()}`);
     console.log(`   Capital inicial: $${initialCapital.toLocaleString()}`);
     console.log(`   Símbolos: ${symbols.length}`);
 
-    const startDate = `${year}-01-01T00:00:00Z`;
-    const endDate = year === 2025 ? `${year}-12-14T23:59:59Z` : `${year}-12-31T23:59:59Z`;
+    // INSTITUCIONAL: Periodo completo 2023-2025 para todas las estrategias
+    const startDate = '2023-01-01T00:00:00Z';
+    const endDate = '2025-12-11T23:59:59Z';
 
     // ============================================
     // PARÁMETROS PROFESIONALES
@@ -787,7 +788,7 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
     // LOGGING FINAL INSTITUCIONAL
     // ============================================
     console.log(`\n✅ ============================================`);
-    console.log(`   RESULTADOS INSTITUCIONALES - ${strategy.toUpperCase()} ${year}`);
+    console.log(`   RESULTADOS INSTITUCIONALES - ${strategy.toUpperCase()} 2023-2025`);
     console.log(`   ============================================`);
     console.log(`   Capital inicial:     $${initialCapital.toLocaleString()}`);
     console.log(`   Capital final:       $${finalCapital.toLocaleString()}`);
@@ -838,6 +839,8 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
             dataSource: 'Alpaca Markets',
             timeframe: '1Hour',
             adjustment: 'all',
+            period: '2023-01-01 to 2025-12-11',
+            periodYears: '2023-2025',
             commissionPerTrade: COMMISSION_PER_TRADE,
             secFeeRate: 0.0000278,
             tafFeeRate: 0.000166,
