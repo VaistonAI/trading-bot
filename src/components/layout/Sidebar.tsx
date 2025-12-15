@@ -293,22 +293,15 @@ export const Sidebar: React.FC = () => {
             permission: 'canViewStrategies'
         },
         {
-            path: '/results/2024',
-            label: 'Resultados 2024',
+            path: '/results',
+            label: 'Resultados',
             icon: <FaChartArea />,
-            permission: 'canViewStrategies'
-        },
-        {
-            path: '/results/2023',
-            label: 'Resultados 2023',
-            icon: <FaChartArea />,
-            permission: 'canViewStrategies'
-        },
-        {
-            path: '/results/2022',
-            label: 'Resultados 2022',
-            icon: <FaChartArea />,
-            permission: 'canViewStrategies'
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results/2024', label: '2024' },
+                { path: '/results/2023', label: '2023' },
+                { path: '/results/2022', label: '2022' }
+            ]
         },
         {
             path: '/users',
@@ -425,8 +418,8 @@ export const Sidebar: React.FC = () => {
                                                             to={subItem.path}
                                                             onClick={() => setIsOpen(false)}
                                                             className={`block px-4 py-2 text-sm rounded-lg transition-all duration-200 ${isActive(subItem.path)
-                                                                    ? 'bg-white/20 text-white font-semibold'
-                                                                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                                                                ? 'bg-white/20 text-white font-semibold'
+                                                                : 'text-white/70 hover:bg-white/10 hover:text-white'
                                                                 }`}
                                                         >
                                                             {subItem.label}
