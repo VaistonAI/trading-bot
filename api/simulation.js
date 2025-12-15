@@ -129,6 +129,205 @@ function calculateGrowthSignal(bars) {
 }
 
 /**
+ * Calcula indicadores de Mean Reversion (Reversión a la Media)
+ */
+function calculateMeanReversionSignal(bars) {
+    if (bars.length < 20) return null;
+
+    const recentBars = bars.slice(-20);
+    const prices = recentBars.map(b => b.c);
+    const mean = prices.reduce((a, b) => a + b, 0) / 20;
+    const variance = prices.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / 20;
+    const stdDev = Math.sqrt(variance);
+    const currentPrice = prices[prices.length - 1];
+
+    // Señal de compra: precio por debajo de 2 desviaciones estándar
+    if (currentPrice < mean - 2 * stdDev) {
+        return { signal: 'BUY', strength: Math.abs((currentPrice - mean) / stdDev) };
+    }
+
+    // Señal de venta: precio vuelve a la media o la supera
+    if (currentPrice > mean) {
+        return { signal: 'SELL', strength: (currentPrice - mean) / stdDev };
+    }
+
+    return null;
+}
+
+/**
+ * Calcula indicadores de Breakout (Ruptura)
+ */
+function calculateBreakoutSignal(bars) {
+    if (bars.length < 50) return null;
+
+    const recentBars = bars.slice(-50);
+    const currentBar = recentBars[recentBars.length - 1];
+    const max50 = Math.max(...recentBars.map(b => b.h));
+    const min20 = Math.min(...recentBars.slice(-20).map(b => b.l));
+    const avgVolume = recentBars.reduce((sum, b) => sum + b.v, 0) / 50;
+
+    // Señal de compra: rompe máximo de 50 días con volumen alto
+    if (currentBar.c > max50 && currentBar.v > avgVolume * 1.5) {
+        return { signal: 'BUY', strength: ((currentBar.c - max50) / max50) * 100 };
+    }
+
+    // Señal de venta: rompe mínimo de 20 días
+    if (currentBar.c < min20) {
+        return { signal: 'SELL', strength: ((min20 - currentBar.c) / min20) * 100 };
+    }
+
+    return null;
+}
+
+/**
+ * Calcula indicadores de RSI (Relative Strength Index)
+ */
+function calculateRSIOnlySignal(bars) {
+    if (bars.length < 15) return null;
+
+    const period = 14;
+    const recentBars = bars.slice(-period - 1);
+    let gains = 0, losses = 0;
+
+    for (let i = 1; i < recentBars.length; i++) {
+        const change = recentBars[i].c - recentBars[i - 1].c;
+        if (change > 0) gains += change;
+        else losses += Math.abs(change);
+    }
+
+    const avgGain = gains / period;
+    const avgLoss = losses / period;
+    const rs = avgGain / (avgLoss || 1);
+    const rsi = 100 - (100 / (1 + rs));
+
+    // Señal de compra: RSI < 30 (sobreventa)
+    if (rsi < 30) {
+        return { signal: 'BUY', strength: 30 - rsi };
+    }
+
+    // Señal de venta: RSI > 70 (sobrecompra)
+    if (rsi > 70) {
+        return { signal: 'SELL', strength: rsi - 70 };
+    }
+
+    return null;
+}
+
+/**
+ * Calcula indicadores de MACD (Moving Average Convergence Divergence)
+ */
+function calculateMACDOnlySignal(bars) {
+    if (bars.length < 35) return null;
+
+    const calculateEMA = (data, period) => {
+        const k = 2 / (period + 1);
+        let ema = data[0];
+        for (let i = 1; i < data.length; i++) {
+            ema = data[i] * k + ema * (1 - k);
+        }
+        return ema;
+    };
+
+    const prices = bars.map(b => b.c);
+
+    // Calcular MACD line
+    const macdLine = [];
+    for (let i = 26; i <= prices.length; i++) {
+        const slice = prices.slice(Math.max(0, i - 26), i);
+        if (slice.length >= 26) {
+            const ema12 = calculateEMA(slice.slice(-12), 12);
+            const ema26 = calculateEMA(slice, 26);
+            macdLine.push(ema12 - ema26);
+        }
+    }
+
+    if (macdLine.length < 9) return null;
+
+    // Calcular signal line
+    const signalLine = calculateEMA(macdLine.slice(-9), 9);
+    const currentMACD = macdLine[macdLine.length - 1];
+    const prevMACD = macdLine[macdLine.length - 2];
+
+    // Señal de compra: MACD cruza señal hacia arriba
+    if (currentMACD > signalLine && prevMACD <= signalLine) {
+        return { signal: 'BUY', strength: Math.abs(currentMACD - signalLine) };
+    }
+
+    // Señal de venta: MACD cruza señal hacia abajo
+    if (currentMACD < signalLine && prevMACD >= signalLine) {
+        return { signal: 'SELL', strength: Math.abs(currentMACD - signalLine) };
+    }
+
+    return null;
+}
+
+/**
+ * Calcula indicadores de Volume Weighted (Ponderado por Volumen)
+ */
+function calculateVolumeWeightedSignal(bars) {
+    if (bars.length < 20) return null;
+
+    const recentBars = bars.slice(-20);
+    const currentBar = recentBars[recentBars.length - 1];
+    const prevBar = recentBars[recentBars.length - 2];
+
+    const priceChange = ((currentBar.c - prevBar.c) / prevBar.c) * 100;
+    const avgVolume = recentBars.slice(0, -1).reduce((sum, b) => sum + b.v, 0) / 19;
+    const volumeChange = ((currentBar.v - avgVolume) / avgVolume) * 100;
+
+    // Señal de compra: precio y volumen crecen juntos
+    if (priceChange > 2 && volumeChange > 20) {
+        return { signal: 'BUY', strength: (priceChange + volumeChange) / 2 };
+    }
+
+    // Señal de venta: precio cae o volumen cae significativamente
+    if (priceChange < -2 || volumeChange < -20) {
+        return { signal: 'SELL', strength: Math.abs((priceChange + volumeChange) / 2) };
+    }
+
+    return null;
+}
+
+/**
+ * Calcula indicadores de Pairs Trading (Arbitraje de Pares)
+ * Nota: Versión simplificada usando correlación entre símbolos
+ */
+function calculatePairsTradingSignal(bars) {
+    if (bars.length < 30) return null;
+
+    const recentBars = bars.slice(-30);
+    const prices = recentBars.map(b => b.c);
+
+    // Calcular ratio de precio vs promedio móvil
+    const ma20 = prices.slice(-20).reduce((a, b) => a + b, 0) / 20;
+    const currentPrice = prices[prices.length - 1];
+    const ratio = currentPrice / ma20;
+
+    // Calcular desviación del ratio
+    const ratios = [];
+    for (let i = 20; i < prices.length; i++) {
+        const ma = prices.slice(i - 20, i).reduce((a, b) => a + b, 0) / 20;
+        ratios.push(prices[i] / ma);
+    }
+
+    const meanRatio = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+    const variance = ratios.reduce((sum, r) => sum + Math.pow(r - meanRatio, 2), 0) / ratios.length;
+    const stdDev = Math.sqrt(variance);
+
+    // Señal de compra: ratio muy por debajo de la media (par barato)
+    if (ratio < meanRatio - 1.5 * stdDev) {
+        return { signal: 'BUY', strength: Math.abs((ratio - meanRatio) / stdDev) };
+    }
+
+    // Señal de venta: ratio muy por encima de la media (par caro)
+    if (ratio > meanRatio + 1.5 * stdDev) {
+        return { signal: 'SELL', strength: (ratio - meanRatio) / stdDev };
+    }
+
+    return null;
+}
+
+/**
  * INSTITUCIONAL: Valida si una barra está dentro del horario de mercado
  * NYSE: 9:30 AM - 4:00 PM EST (lunes a viernes)
  */
@@ -364,6 +563,18 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
                 signal = calculateMomentumSignal(historicalBars);
             } else if (strategy === 'growth') {
                 signal = calculateGrowthSignal(historicalBars);
+            } else if (strategy === 'meanreversion') {
+                signal = calculateMeanReversionSignal(historicalBars);
+            } else if (strategy === 'breakout') {
+                signal = calculateBreakoutSignal(historicalBars);
+            } else if (strategy === 'rsi') {
+                signal = calculateRSIOnlySignal(historicalBars);
+            } else if (strategy === 'macd') {
+                signal = calculateMACDOnlySignal(historicalBars);
+            } else if (strategy === 'volumeweighted') {
+                signal = calculateVolumeWeightedSignal(historicalBars);
+            } else if (strategy === 'pairs') {
+                signal = calculatePairsTradingSignal(historicalBars);
             } else {
                 signal = calculateValueSignal(historicalBars);
             }

@@ -29,6 +29,24 @@ import { ResultsMomentum2023 } from './pages/results/ResultsMomentum2023';
 import { ResultsGrowth2025 } from './pages/results/ResultsGrowth2025';
 import { ResultsGrowth2024 } from './pages/results/ResultsGrowth2024';
 import { ResultsGrowth2023 } from './pages/results/ResultsGrowth2023';
+import { ResultsMeanReversion2025 } from './pages/results/ResultsMeanReversion2025';
+import { ResultsMeanReversion2024 } from './pages/results/ResultsMeanReversion2024';
+import { ResultsMeanReversion2023 } from './pages/results/ResultsMeanReversion2023';
+import { ResultsBreakout2025 } from './pages/results/ResultsBreakout2025';
+import { ResultsBreakout2024 } from './pages/results/ResultsBreakout2024';
+import { ResultsBreakout2023 } from './pages/results/ResultsBreakout2023';
+import { ResultsRSI2025 } from './pages/results/ResultsRSI2025';
+import { ResultsRSI2024 } from './pages/results/ResultsRSI2024';
+import { ResultsRSI2023 } from './pages/results/ResultsRSI2023';
+import { ResultsMACD2025 } from './pages/results/ResultsMACD2025';
+import { ResultsMACD2024 } from './pages/results/ResultsMACD2024';
+import { ResultsMACD2023 } from './pages/results/ResultsMACD2023';
+import { ResultsVolumeWeighted2025 } from './pages/results/ResultsVolumeWeighted2025';
+import { ResultsVolumeWeighted2024 } from './pages/results/ResultsVolumeWeighted2024';
+import { ResultsVolumeWeighted2023 } from './pages/results/ResultsVolumeWeighted2023';
+import { ResultsPairs2025 } from './pages/results/ResultsPairs2025';
+import { ResultsPairs2024 } from './pages/results/ResultsPairs2024';
+import { ResultsPairs2023 } from './pages/results/ResultsPairs2023';
 import { UserManagement } from './pages/users/UserManagement';
 import { HelpPage } from './pages/help/HelpPage';
 
@@ -191,6 +209,36 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Mean Reversion Strategy Results */}
+          <Route path="/results-meanreversion/2025" element={<ProtectedRoute><ResultsMeanReversion2025 /></ProtectedRoute>} />
+          <Route path="/results-meanreversion/2024" element={<ProtectedRoute><ResultsMeanReversion2024 /></ProtectedRoute>} />
+          <Route path="/results-meanreversion/2023" element={<ProtectedRoute><ResultsMeanReversion2023 /></ProtectedRoute>} />
+
+          {/* Breakout Strategy Results */}
+          <Route path="/results-breakout/2025" element={<ProtectedRoute><ResultsBreakout2025 /></ProtectedRoute>} />
+          <Route path="/results-breakout/2024" element={<ProtectedRoute><ResultsBreakout2024 /></ProtectedRoute>} />
+          <Route path="/results-breakout/2023" element={<ProtectedRoute><ResultsBreakout2023 /></ProtectedRoute>} />
+
+          {/* RSI Strategy Results */}
+          <Route path="/results-rsi/2025" element={<ProtectedRoute><ResultsRSI2025 /></ProtectedRoute>} />
+          <Route path="/results-rsi/2024" element={<ProtectedRoute><ResultsRSI2024 /></ProtectedRoute>} />
+          <Route path="/results-rsi/2023" element={<ProtectedRoute><ResultsRSI2023 /></ProtectedRoute>} />
+
+          {/* MACD Strategy Results */}
+          <Route path="/results-macd/2025" element={<ProtectedRoute><ResultsMACD2025 /></ProtectedRoute>} />
+          <Route path="/results-macd/2024" element={<ProtectedRoute><ResultsMACD2024 /></ProtectedRoute>} />
+          <Route path="/results-macd/2023" element={<ProtectedRoute><ResultsMACD2023 /></ProtectedRoute>} />
+
+          {/* Volume Weighted Strategy Results */}
+          <Route path="/results-volumeweighted/2025" element={<ProtectedRoute><ResultsVolumeWeighted2025 /></ProtectedRoute>} />
+          <Route path="/results-volumeweighted/2024" element={<ProtectedRoute><ResultsVolumeWeighted2024 /></ProtectedRoute>} />
+          <Route path="/results-volumeweighted/2023" element={<ProtectedRoute><ResultsVolumeWeighted2023 /></ProtectedRoute>} />
+
+          {/* Pairs Trading Strategy Results */}
+          <Route path="/results-pairs/2025" element={<ProtectedRoute><ResultsPairs2025 /></ProtectedRoute>} />
+          <Route path="/results-pairs/2024" element={<ProtectedRoute><ResultsPairs2024 /></ProtectedRoute>} />
+          <Route path="/results-pairs/2023" element={<ProtectedRoute><ResultsPairs2023 /></ProtectedRoute>} />
 
           {/* Research Route */}
           <Route

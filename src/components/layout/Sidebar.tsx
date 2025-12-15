@@ -326,6 +326,72 @@ export const Sidebar: React.FC = () => {
             ]
         },
         {
+            path: '/results-meanreversion',
+            label: 'R Mean Reversion',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-meanreversion/2025', label: '2025' },
+                { path: '/results-meanreversion/2024', label: '2024' },
+                { path: '/results-meanreversion/2023', label: '2023' }
+            ]
+        },
+        {
+            path: '/results-breakout',
+            label: 'R Breakout',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-breakout/2025', label: '2025' },
+                { path: '/results-breakout/2024', label: '2024' },
+                { path: '/results-breakout/2023', label: '2023' }
+            ]
+        },
+        {
+            path: '/results-rsi',
+            label: 'R RSI',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-rsi/2025', label: '2025' },
+                { path: '/results-rsi/2024', label: '2024' },
+                { path: '/results-rsi/2023', label: '2023' }
+            ]
+        },
+        {
+            path: '/results-macd',
+            label: 'R MACD',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-macd/2025', label: '2025' },
+                { path: '/results-macd/2024', label: '2024' },
+                { path: '/results-macd/2023', label: '2023' }
+            ]
+        },
+        {
+            path: '/results-volumeweighted',
+            label: 'R Volume Weighted',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-volumeweighted/2025', label: '2025' },
+                { path: '/results-volumeweighted/2024', label: '2024' },
+                { path: '/results-volumeweighted/2023', label: '2023' }
+            ]
+        },
+        {
+            path: '/results-pairs',
+            label: 'R Pairs Trading',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-pairs/2025', label: '2025' },
+                { path: '/results-pairs/2024', label: '2024' },
+                { path: '/results-pairs/2023', label: '2023' }
+            ]
+        },
+        {
             path: '/users',
             label: 'Usuarios',
             icon: <FaUsersCog />,
