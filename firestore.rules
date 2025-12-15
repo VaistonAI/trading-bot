@@ -66,6 +66,42 @@ service cloud.firestore {
       allow write: if canViewReports();
     }
     
+    // Simulations Mean Reversion collection
+    match /simulations-meanreversion/{year} {
+      allow read: if canViewReports();
+      allow write: if canViewReports();
+    }
+    
+    // Simulations Breakout collection
+    match /simulations-breakout/{year} {
+      allow read: if canViewReports();
+      allow write: if canViewReports();
+    }
+    
+    // Simulations RSI collection
+    match /simulations-rsi/{year} {
+      allow read: if canViewReports();
+      allow write: if canViewReports();
+    }
+    
+    // Simulations MACD collection
+    match /simulations-macd/{year} {
+      allow read: if canViewReports();
+      allow write: if canViewReports();
+    }
+    
+    // Simulations Volume Weighted collection
+    match /simulations-volumeweighted/{year} {
+      allow read: if canViewReports();
+      allow write: if canViewReports();
+    }
+    
+    // Simulations Pairs Trading collection
+    match /simulations-pairs/{year} {
+      allow read: if canViewReports();
+      allow write: if canViewReports();
+    }
+    
     // Invitations collection
     match /invitations/{invitationId} {
       allow read: if isSignedIn();
