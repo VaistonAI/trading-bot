@@ -58,6 +58,14 @@ service cloud.firestore {
       allow write: if canViewReports();
     }
     
+    // Simulations Growth collection
+    match /simulations-growth/{year} {
+      // Only admins and investors can read simulations
+      allow read: if canViewReports();
+      // Admins and investors can write simulations from frontend
+      allow write: if canViewReports();
+    }
+    
     // Invitations collection
     match /invitations/{invitationId} {
       allow read: if isSignedIn();

@@ -26,6 +26,9 @@ import { Results2022 } from './pages/results/Results2022';
 import { ResultsMomentum2025 } from './pages/results/ResultsMomentum2025';
 import { ResultsMomentum2024 } from './pages/results/ResultsMomentum2024';
 import { ResultsMomentum2023 } from './pages/results/ResultsMomentum2023';
+import { ResultsGrowth2025 } from './pages/results/ResultsGrowth2025';
+import { ResultsGrowth2024 } from './pages/results/ResultsGrowth2024';
+import { ResultsGrowth2023 } from './pages/results/ResultsGrowth2023';
 import { UserManagement } from './pages/users/UserManagement';
 import { HelpPage } from './pages/help/HelpPage';
 
@@ -161,6 +164,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <ResultsMomentum2023 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results-growth/2025"
+            element={
+              <ProtectedRoute>
+                <ResultsGrowth2025 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results-growth/2024"
+            element={
+              <ProtectedRoute>
+                <ResultsGrowth2024 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results-growth/2023"
+            element={
+              <ProtectedRoute>
+                <ResultsGrowth2023 />
               </ProtectedRoute>
             }
           />

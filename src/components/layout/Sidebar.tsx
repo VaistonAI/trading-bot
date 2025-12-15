@@ -315,6 +315,17 @@ export const Sidebar: React.FC = () => {
             ]
         },
         {
+            path: '/results-growth',
+            label: 'R Growth',
+            icon: <FaChartArea />,
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results-growth/2025', label: '2025' },
+                { path: '/results-growth/2024', label: '2024' },
+                { path: '/results-growth/2023', label: '2023' }
+            ]
+        },
+        {
             path: '/users',
             label: 'Usuarios',
             icon: <FaUsersCog />,
