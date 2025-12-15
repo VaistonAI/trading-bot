@@ -26,8 +26,6 @@ export const Results2024: React.FC = () => {
     const [results, setResults] = useState<SimulationResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-    const [showSaveButton, setShowSaveButton] = useState(false);
 
     useEffect(() => {
         loadResults();
@@ -66,7 +64,7 @@ export const Results2024: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 setResults(data);
-                setShowSaveButton(true); // Mostrar botón de guardar
+                alert('✅ Simulación completada y guardada en Firebase');
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.error}`);
@@ -76,24 +74,6 @@ export const Results2024: React.FC = () => {
             alert('Error ejecutando simulación');
         } finally {
             setIsRunning(false);
-        }
-    };
-
-    const saveToFirebase = async () => {
-        if (!results) return;
-
-        try {
-            setIsSaving(true);
-            const { setDoc, doc } = await import('firebase/firestore');
-            const docRef = doc(db, 'simulations', '2024');
-            await setDoc(docRef, results);
-            alert('✅ Resultados guardados en Firebase exitosamente');
-            setShowSaveButton(false);
-        } catch (error) {
-            console.error('Error saving to Firebase:', error);
-            alert('Error guardando en Firebase');
-        } finally {
-            setIsSaving(false);
         }
     };
 
@@ -121,36 +101,19 @@ export const Results2024: React.FC = () => {
                             Simulación histórica de la estrategia Value Investing en 2024
                         </p>
                     </div>
-                    <div className="flex gap-3">
-                        {!results && (
-                            <button
-                                onClick={runSimulation}
-                                disabled={isRunning}
-                                className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${
-                                    isRunning
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-primary text-white hover:bg-primary-dark'
+                    {!results && (
+                        <button
+                            onClick={runSimulation}
+                            disabled={isRunning}
+                            className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isRunning
+                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                : 'bg-primary text-white hover:bg-primary-dark'
                                 }`}
-                            >
-                                <FaPlay />
-                                {isRunning ? 'Ejecutando...' : 'Ejecutar Simulación'}
-                            </button>
-                        )}
-                        {showSaveButton && (
-                            <button
-                                onClick={saveToFirebase}
-                                disabled={isSaving}
-                                className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${
-                                    isSaving
-                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                        : 'bg-green-600 text-white hover:bg-green-700'
-                                }`}
-                            >
-                                <FaCheckCircle />
-                                {isSaving ? 'Guardando...' : 'Guardar en Firebase'}
-                            </button>
-                        )}
-                    </div>
+                        >
+                            <FaPlay />
+                            {isRunning ? 'Ejecutando...' : 'Ejecutar Simulación'}
+                        </button>
+                    )}
                 </div>
 
                 {results ? (
