@@ -298,6 +298,7 @@ export const Sidebar: React.FC = () => {
             icon: <FaChartArea />,
             permission: 'canViewStrategies',
             submenu: [
+                { path: '/results/2025', label: '2025' },
                 { path: '/results/2024', label: '2024' },
                 { path: '/results/2023', label: '2023' }
             ]

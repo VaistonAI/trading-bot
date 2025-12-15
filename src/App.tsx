@@ -19,6 +19,7 @@ import { Simulation } from './pages/simulation/Simulation';
 import { Research } from './pages/research/Research';
 import { LiveTrading } from './pages/trading/LiveTrading';
 import { DailyReports } from './pages/reports/DailyReports';
+import { Results2025 } from './pages/results/Results2025';
 import { Results2024 } from './pages/results/Results2024';
 import { Results2023 } from './pages/results/Results2023';
 import { Results2022 } from './pages/results/Results2022';
@@ -105,9 +106,17 @@ function App() {
             }
           />
           <Route
+            path="/results/2025"
+            element={
+              <ProtectedRoute requiredPermission="canViewStrategies">
+                <Results2025 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/results/2024"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredPermission="canViewStrategies">
                 <Results2024 />
               </ProtectedRoute>
             }
