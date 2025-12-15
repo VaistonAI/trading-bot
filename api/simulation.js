@@ -46,6 +46,87 @@ function calculateValueSignal(bars) {
 }
 
 /**
+ * Calcula indicadores de Momentum
+ */
+function calculateMomentumSignal(bars) {
+    if (bars.length < 50) return null;
+
+    const recentBars = bars.slice(-50);
+    const currentPrice = recentBars[recentBars.length - 1].c;
+
+    // Calcular MA20 y MA50
+    const ma20Bars = recentBars.slice(-20);
+    const ma50Bars = recentBars;
+    const ma20 = ma20Bars.reduce((sum, bar) => sum + bar.c, 0) / 20;
+    const ma50 = ma50Bars.reduce((sum, bar) => sum + bar.c, 0) / 50;
+
+    // Calcular RSI simplificado (últimos 14 días)
+    const rsiPeriod = 14;
+    const rsiBars = recentBars.slice(-rsiPeriod);
+    let gains = 0, losses = 0;
+    for (let i = 1; i < rsiBars.length; i++) {
+        const change = rsiBars[i].c - rsiBars[i - 1].c;
+        if (change > 0) gains += change;
+        else losses += Math.abs(change);
+    }
+    const avgGain = gains / rsiPeriod;
+    const avgLoss = losses / rsiPeriod;
+    const rs = avgGain / (avgLoss || 1);
+    const rsi = 100 - (100 / (1 + rs));
+
+    // Señal de compra: precio > MA20 > MA50 y RSI > 50 (tendencia alcista fuerte)
+    if (currentPrice > ma20 && ma20 > ma50 && rsi > 50) {
+        const strength = ((currentPrice - ma50) / ma50) * 100;
+        return { signal: 'BUY', strength };
+    }
+
+    // Señal de venta: precio < MA20 o RSI < 40 (perdiendo momentum)
+    if (currentPrice < ma20 || rsi < 40) {
+        const strength = ((ma20 - currentPrice) / ma20) * 100;
+        return { signal: 'SELL', strength };
+    }
+
+    return null;
+}
+
+/**
+ * Calcula indicadores de Growth
+ */
+function calculateGrowthSignal(bars) {
+    if (bars.length < 30) return null;
+
+    const recentBars = bars.slice(-30);
+    const currentPrice = recentBars[recentBars.length - 1].c;
+
+    // Calcular tasa de crecimiento de precio (últimos 30 días)
+    const oldPrice = recentBars[0].c;
+    const priceGrowth = ((currentPrice - oldPrice) / oldPrice) * 100;
+
+    // Calcular volatilidad (desviación estándar)
+    const prices = recentBars.map(b => b.c);
+    const avgPrice = prices.reduce((sum, p) => sum + p, 0) / prices.length;
+    const variance = prices.reduce((sum, p) => sum + Math.pow(p - avgPrice, 2), 0) / prices.length;
+    const volatility = Math.sqrt(variance);
+
+    // Calcular tendencia de volumen (creciente = interés)
+    const firstHalfVolume = recentBars.slice(0, 15).reduce((sum, b) => sum + b.v, 0) / 15;
+    const secondHalfVolume = recentBars.slice(15).reduce((sum, b) => sum + b.v, 0) / 15;
+    const volumeGrowth = ((secondHalfVolume - firstHalfVolume) / firstHalfVolume) * 100;
+
+    // Señal de compra: crecimiento fuerte (>10%) con volumen creciente
+    if (priceGrowth > 10 && volumeGrowth > 20) {
+        return { signal: 'BUY', strength: priceGrowth };
+    }
+
+    // Señal de venta: crecimiento negativo o volatilidad muy alta
+    if (priceGrowth < -5 || (volatility / avgPrice) > 0.15) {
+        return { signal: 'SELL', strength: Math.abs(priceGrowth) };
+    }
+
+    return null;
+}
+
+/**
  * Ejecuta una simulación de backtesting para un año específico
  */
 async function runSimulation(year, strategy, symbols, initialCapital, alpacaHeaders) {
@@ -111,8 +192,16 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
             const currentBar = bars[barIndex];
             const historicalBars = bars.slice(0, barIndex + 1);
 
-            // Calcular señal
-            const signal = calculateValueSignal(historicalBars);
+            // Calcular señal según la estrategia
+            let signal;
+            if (strategy === 'momentum') {
+                signal = calculateMomentumSignal(historicalBars);
+            } else if (strategy === 'growth') {
+                signal = calculateGrowthSignal(historicalBars);
+            } else {
+                // Default: value
+                signal = calculateValueSignal(historicalBars);
+            }
 
             if (signal && signal.signal === 'BUY' && !positions.has(symbol) && positions.size < maxPositions) {
                 // Comprar
