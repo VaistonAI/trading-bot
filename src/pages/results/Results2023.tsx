@@ -119,7 +119,7 @@ export const Results2023: React.FC = () => {
                         <div className="mb-6 flex items-center gap-2 text-green-600">
                             <FaCheckCircle />
                             <span className="font-semibold">
-                                Simulación completada el {new Date(results.ranAt).toLocaleDateString('es-MX')}
+                                Simulación completada el {results.ranAt?.toDate ? new Date(results.ranAt.toDate()).toLocaleDateString('es-MX') : new Date(results.ranAt).toLocaleDateString('es-MX')}
                             </span>
                         </div>
 
