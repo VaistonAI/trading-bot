@@ -46,8 +46,8 @@ service cloud.firestore {
     match /simulations/{year} {
       // Only admins and investors can read simulations
       allow read: if canViewReports();
-      // Only backend can write (no client writes allowed)
-      allow write: if false;
+      // Only admins can write simulations from frontend
+      allow write: if isAdmin();
     }
     
     // Invitations collection

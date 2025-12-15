@@ -49,19 +49,6 @@ function calculateValueSignal(bars) {
  * Ejecuta una simulación de backtesting para un año específico
  */
 async function runSimulation(year, strategy, symbols, initialCapital, alpacaHeaders) {
-    // Check if already exists in Firebase
-    try {
-        const docRef = db.collection('simulations').doc(year.toString());
-        const doc = await docRef.get();
-
-        if (doc.exists) {
-            console.log(`📦 Returning existing simulation from Firebase for ${year}`);
-            return doc.data();
-        }
-    } catch (error) {
-        console.log('Firebase check failed, proceeding with new simulation');
-    }
-
     console.log(`\n🔄 Iniciando backtesting REAL para ${year}...`);
     console.log(`   Estrategia: ${strategy}`);
     console.log(`   Capital inicial: $${initialCapital}`);
@@ -227,29 +214,8 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         worstTrade,
         monthlyBreakdown,
         trades: trades.slice(0, 100), // Limitar a 100 trades para no sobrecargar
-        ranAt: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        ranAt: new Date().toISOString()
     };
-
-    // Save to Firebase
-    console.log(`\n💾 Guardando resultados en Firebase...`);
-    try {
-        const docRef = db.collection('simulations').doc(year.toString());
-        await docRef.set(results);
-        console.log(`✅ Resultados guardados exitosamente en Firebase`);
-        console.log(`   Documento: simulations/${year}`);
-
-        // Verificar que se guardó
-        const savedDoc = await docRef.get();
-        if (savedDoc.exists) {
-            console.log(`✅ Verificación: Documento existe en Firebase`);
-        } else {
-            console.error(`❌ ERROR: Documento NO se guardó en Firebase`);
-        }
-    } catch (error) {
-        console.error('❌ Error saving to Firebase:', error.message);
-        console.error('   Stack:', error.stack);
-    }
 
     console.log(`\n✅ Backtesting completado:`);
     console.log(`   Total Trades: ${trades.length}`);
