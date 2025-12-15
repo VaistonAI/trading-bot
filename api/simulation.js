@@ -127,64 +127,86 @@ function calculateGrowthSignal(bars) {
 }
 
 /**
- * Ejecuta una simulación de backtesting para un año específico
+ * Ejecuta una simulación de backtesting PROFESIONAL para un año específico
+ * INCLUYE: Comisiones, Slippage, Validación de Volumen, Días Hábiles
  */
 async function runSimulation(year, strategy, symbols, initialCapital, alpacaHeaders) {
-    console.log(`\n🔄 Iniciando backtesting REAL para ${year}...`);
-    console.log(`   Estrategia: ${strategy}`);
-    console.log(`   Capital inicial: $${initialCapital}`);
+    console.log(`\n🔄 ============================================`);
+    console.log(`   BACKTESTING PROFESIONAL ${year}`);
+    console.log(`   ============================================`);
+    console.log(`   Estrategia: ${strategy.toUpperCase()}`);
+    console.log(`   Capital inicial: $${initialCapital.toLocaleString()}`);
     console.log(`   Símbolos: ${symbols.length}`);
 
     const startDate = `${year}-01-01T00:00:00Z`;
-    // Para 2025, usar hasta el 14 de diciembre; para otros años, usar 31 de diciembre
     const endDate = year === 2025 ? `${year}-12-14T23:59:59Z` : `${year}-12-31T23:59:59Z`;
 
+    // ============================================
+    // PARÁMETROS PROFESIONALES
+    // ============================================
+    const COMMISSION_PER_TRADE = 1.00;      // $1 por operación (Alpaca comisión)
+    const SLIPPAGE_PERCENT = 0.1;           // 0.1% slippage realista
+    const MIN_VOLUME_THRESHOLD = 100000;    // Mínimo 100k acciones/día
+    const MAX_POSITION_PERCENT = 0.15;      // Máximo 15% del capital por posición
+    const MAX_POSITIONS = 10;               // Máximo 10 posiciones simultáneas
+
     let capital = initialCapital;
+    let totalCommissions = 0;
     const trades = [];
     const monthlyBreakdown = Array(12).fill(null).map((_, i) => ({
         month: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][i],
         trades: 0,
-        pnl: 0
+        pnl: 0,
+        grossPnl: 0,
+        commissions: 0
     }));
 
     let bestTrade = { symbol: '', pnl: -Infinity };
     let worstTrade = { symbol: '', pnl: Infinity };
-    const positions = new Map(); // symbol -> { shares, entryPrice, entryDate }
+    const positions = new Map();
 
-    console.log('\n📊 Obteniendo datos históricos...');
+    console.log(`\n📊 Descargando datos históricos de Alpaca...`);
 
-    // Obtener datos históricos para todos los símbolos
+    // Obtener datos históricos
     const historicalData = new Map();
     for (const symbol of symbols) {
         try {
-            console.log(`   Descargando ${symbol}...`);
             const bars = await getHistoricalBars(symbol, startDate, endDate, alpacaHeaders);
-            if (bars.length > 0) {
+            if (bars && bars.length > 0) {
                 historicalData.set(symbol, bars);
+                console.log(`   ✓ ${symbol}: ${bars.length} días`);
             }
-            // Delay para evitar rate limiting
             await new Promise(resolve => setTimeout(resolve, 200));
         } catch (error) {
-            console.error(`   Error con ${symbol}:`, error.message);
+            console.error(`   ✗ ${symbol}: ${error.message}`);
         }
     }
 
-    console.log(`\n✅ Datos descargados para ${historicalData.size} símbolos`);
-    console.log('🤖 Ejecutando estrategia...\n');
+    console.log(`\n✅ Datos descargados: ${historicalData.size} símbolos`);
 
-    // Simular trading día por día
+    // Obtener fechas únicas y filtrar solo días hábiles
     const allDates = new Set();
     historicalData.forEach(bars => {
-        bars.forEach(bar => allDates.add(bar.t.split('T')[0]));
+        bars.forEach(bar => {
+            const dateStr = bar.t.split('T')[0];
+            const date = new Date(dateStr + 'T12:00:00Z');
+            const dayOfWeek = date.getUTCDay();
+            // Solo lunes (1) a viernes (5)
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                allDates.add(dateStr);
+            }
+        });
     });
 
-    const sortedDates = Array.from(allDates).sort();
-    const maxPositions = 10;
-    const positionSize = initialCapital / maxPositions;
+    const tradingDays = Array.from(allDates).sort();
+    console.log(`📅 Días de trading (lun-vie): ${tradingDays.length}`);
+    console.log(`\n🤖 Ejecutando estrategia ${strategy.toUpperCase()}...\n`);
 
-    for (const date of sortedDates) {
-        // Revisar cada símbolo
+    // ============================================
+    // SIMULACIÓN DÍA POR DÍA
+    // ============================================
+    for (const date of tradingDays) {
         for (const [symbol, bars] of historicalData.entries()) {
             const barIndex = bars.findIndex(b => b.t.startsWith(date));
             if (barIndex === -1) continue;
@@ -192,40 +214,75 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
             const currentBar = bars[barIndex];
             const historicalBars = bars.slice(0, barIndex + 1);
 
-            // Calcular señal según la estrategia
+            // VALIDACIÓN DE VOLUMEN
+            if (currentBar.v < MIN_VOLUME_THRESHOLD) {
+                continue; // Saltar si no hay liquidez suficiente
+            }
+
+            // Calcular señal según estrategia
             let signal;
             if (strategy === 'momentum') {
                 signal = calculateMomentumSignal(historicalBars);
             } else if (strategy === 'growth') {
                 signal = calculateGrowthSignal(historicalBars);
             } else {
-                // Default: value
                 signal = calculateValueSignal(historicalBars);
             }
 
-            if (signal && signal.signal === 'BUY' && !positions.has(symbol) && positions.size < maxPositions) {
-                // Comprar
-                const shares = Math.floor(positionSize / currentBar.c);
-                if (shares > 0) {
+            // ============================================
+            // LÓGICA DE COMPRA CON RESTRICCIONES REALES
+            // ============================================
+            if (signal && signal.signal === 'BUY' && !positions.has(symbol) && positions.size < MAX_POSITIONS) {
+                // Calcular tamaño de posición dinámico
+                const maxPositionValue = capital * MAX_POSITION_PERCENT;
+                const basePositionValue = initialCapital / MAX_POSITIONS;
+                const positionValue = Math.min(maxPositionValue, basePositionValue);
+
+                // APLICAR SLIPPAGE EN COMPRA (compramos más caro)
+                const executionPrice = currentBar.c * (1 + SLIPPAGE_PERCENT / 100);
+
+                const shares = Math.floor(positionValue / executionPrice);
+                const totalCost = (shares * executionPrice) + COMMISSION_PER_TRADE;
+
+                if (shares > 0 && totalCost <= capital) {
                     positions.set(symbol, {
                         shares,
-                        entryPrice: currentBar.c,
-                        entryDate: date
+                        entryPrice: executionPrice,
+                        entryDate: date,
+                        buyCommission: COMMISSION_PER_TRADE
                     });
-                    capital -= shares * currentBar.c;
+
+                    capital -= totalCost;
+                    totalCommissions += COMMISSION_PER_TRADE;
+
+                    console.log(`📈 BUY  ${symbol.padEnd(6)} | ${shares} shares @ $${executionPrice.toFixed(2)} | Comisión: $${COMMISSION_PER_TRADE} | Capital: $${capital.toFixed(2)}`);
                 }
-            } else if (positions.has(symbol)) {
+            }
+            // ============================================
+            // LÓGICA DE VENTA CON RESTRICCIONES REALES
+            // ============================================
+            else if (positions.has(symbol)) {
                 const position = positions.get(symbol);
-                const currentPrice = currentBar.c;
-                const pnlPercent = ((currentPrice - position.entryPrice) / position.entryPrice) * 100;
 
-                // Vender si: señal de venta, stop-loss (-5%), o take-profit (+15%)
+                // APLICAR SLIPPAGE EN VENTA (vendemos más barato)
+                const executionPrice = currentBar.c * (1 - SLIPPAGE_PERCENT / 100);
+                const pnlPercent = ((executionPrice - position.entryPrice) / position.entryPrice) * 100;
+
+                // Vender si: señal SELL, stop-loss (-5%), o take-profit (+15%)
                 if ((signal && signal.signal === 'SELL') || pnlPercent <= -5 || pnlPercent >= 15) {
-                    const sellValue = position.shares * currentPrice;
+                    const sellValue = position.shares * executionPrice;
                     const buyValue = position.shares * position.entryPrice;
-                    const pnl = sellValue - buyValue;
 
-                    capital += sellValue;
+                    // P&L BRUTO (sin comisiones)
+                    const grossPnl = sellValue - buyValue;
+
+                    // P&L NETO (después de comisiones)
+                    const sellCommission = COMMISSION_PER_TRADE;
+                    const totalTradeCommissions = position.buyCommission + sellCommission;
+                    const netPnl = grossPnl - totalTradeCommissions;
+
+                    capital += sellValue - sellCommission;
+                    totalCommissions += sellCommission;
                     positions.delete(symbol);
 
                     const trade = {
@@ -233,87 +290,156 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
                         date,
                         entryDate: position.entryDate,
                         entryPrice: position.entryPrice,
-                        exitPrice: currentPrice,
+                        exitPrice: executionPrice,
                         shares: position.shares,
-                        pnl: parseFloat(pnl.toFixed(2)),
+                        grossPnl: parseFloat(grossPnl.toFixed(2)),
+                        commissions: parseFloat(totalTradeCommissions.toFixed(2)),
+                        pnl: parseFloat(netPnl.toFixed(2)),
                         pnlPercent: parseFloat(pnlPercent.toFixed(2))
                     };
 
                     trades.push(trade);
 
                     // Actualizar mejor/peor trade
-                    if (pnl > bestTrade.pnl) {
-                        bestTrade = { symbol, pnl: parseFloat(pnl.toFixed(2)) };
+                    if (netPnl > bestTrade.pnl) {
+                        bestTrade = { symbol, pnl: netPnl };
                     }
-                    if (pnl < worstTrade.pnl) {
-                        worstTrade = { symbol, pnl: parseFloat(pnl.toFixed(2)) };
+                    if (netPnl < worstTrade.pnl) {
+                        worstTrade = { symbol, pnl: netPnl };
                     }
 
                     // Actualizar desglose mensual
                     const month = parseInt(date.split('-')[1]) - 1;
                     monthlyBreakdown[month].trades++;
-                    monthlyBreakdown[month].pnl += pnl;
+                    monthlyBreakdown[month].grossPnl += grossPnl;
+                    monthlyBreakdown[month].commissions += totalTradeCommissions;
+                    monthlyBreakdown[month].pnl += netPnl;
+
+                    const reason = signal && signal.signal === 'SELL' ? 'SEÑAL' : (pnlPercent <= -5 ? 'STOP-LOSS' : 'TAKE-PROFIT');
+                    console.log(`📉 SELL ${symbol.padEnd(6)} | ${position.shares} shares @ $${executionPrice.toFixed(2)} | P&L: $${netPnl.toFixed(2)} (${pnlPercent.toFixed(2)}%) | ${reason}`);
                 }
             }
         }
     }
 
-    // Cerrar posiciones abiertas al final del año
+    // ============================================
+    // CERRAR POSICIONES ABIERTAS AL FINAL
+    // ============================================
+    console.log(`\n🔒 Cerrando posiciones abiertas al final del período...`);
     for (const [symbol, position] of positions.entries()) {
         const bars = historicalData.get(symbol);
+        if (!bars || bars.length === 0) continue;
+
         const lastBar = bars[bars.length - 1];
-        const sellValue = position.shares * lastBar.c;
+        const executionPrice = lastBar.c * (1 - SLIPPAGE_PERCENT / 100);
+
+        const sellValue = position.shares * executionPrice;
         const buyValue = position.shares * position.entryPrice;
-        const pnl = sellValue - buyValue;
+        const grossPnl = sellValue - buyValue;
 
-        capital += sellValue;
+        const sellCommission = COMMISSION_PER_TRADE;
+        const totalTradeCommissions = position.buyCommission + sellCommission;
+        const netPnl = grossPnl - totalTradeCommissions;
 
-        trades.push({
+        capital += sellValue - sellCommission;
+        totalCommissions += sellCommission;
+
+        const trade = {
             symbol,
-            date: sortedDates[sortedDates.length - 1],
+            date: tradingDays[tradingDays.length - 1],
             entryDate: position.entryDate,
             entryPrice: position.entryPrice,
-            exitPrice: lastBar.c,
+            exitPrice: executionPrice,
             shares: position.shares,
-            pnl: parseFloat(pnl.toFixed(2)),
-            pnlPercent: parseFloat((pnl / buyValue * 100).toFixed(2))
-        });
+            grossPnl: parseFloat(grossPnl.toFixed(2)),
+            commissions: parseFloat(totalTradeCommissions.toFixed(2)),
+            pnl: parseFloat(netPnl.toFixed(2)),
+            pnlPercent: parseFloat(((executionPrice - position.entryPrice) / position.entryPrice * 100).toFixed(2))
+        };
+
+        trades.push(trade);
+
+        if (netPnl > bestTrade.pnl) {
+            bestTrade = { symbol, pnl: netPnl };
+        }
+        if (netPnl < worstTrade.pnl) {
+            worstTrade = { symbol, pnl: netPnl };
+        }
+
+        const month = parseInt(trade.date.split('-')[1]) - 1;
+        monthlyBreakdown[month].trades++;
+        monthlyBreakdown[month].grossPnl += grossPnl;
+        monthlyBreakdown[month].commissions += totalTradeCommissions;
+        monthlyBreakdown[month].pnl += netPnl;
+
+        console.log(`   ${symbol}: Cerrado @ $${executionPrice.toFixed(2)} | P&L: $${netPnl.toFixed(2)}`);
     }
 
-    // Redondear P&L mensual
+    // Redondear valores mensuales
     monthlyBreakdown.forEach(month => {
         month.pnl = parseFloat(month.pnl.toFixed(2));
+        month.grossPnl = parseFloat(month.grossPnl.toFixed(2));
+        month.commissions = parseFloat(month.commissions.toFixed(2));
     });
 
+    // ============================================
+    // CALCULAR RESULTADOS FINALES
+    // ============================================
     const finalCapital = capital;
     const totalPnL = finalCapital - initialCapital;
-    const roi = ((totalPnL / initialCapital) * 100);
+    const totalGrossPnl = trades.reduce((sum, t) => sum + t.grossPnl, 0);
+    const roi = (totalPnL / initialCapital) * 100;
     const winningTrades = trades.filter(t => t.pnl > 0).length;
     const winRate = trades.length > 0 ? (winningTrades / trades.length) * 100 : 0;
 
-    const results = {
+    // ============================================
+    // LOGGING FINAL
+    // ============================================
+    console.log(`\n✅ ============================================`);
+    console.log(`   RESULTADOS FINALES - ${strategy.toUpperCase()} ${year}`);
+    console.log(`   ============================================`);
+    console.log(`   Capital inicial:     $${initialCapital.toLocaleString()}`);
+    console.log(`   Capital final:       $${finalCapital.toLocaleString()}`);
+    console.log(`   P&L Bruto:           $${totalGrossPnl.toFixed(2)}`);
+    console.log(`   Comisiones totales:  -$${totalCommissions.toFixed(2)}`);
+    console.log(`   P&L Neto:            $${totalPnL.toFixed(2)}`);
+    console.log(`   ROI:                 ${roi.toFixed(2)}%`);
+    console.log(`   Total trades:        ${trades.length}`);
+    console.log(`   Trades ganadores:    ${winningTrades}`);
+    console.log(`   Win rate:            ${winRate.toFixed(1)}%`);
+    console.log(`   Mejor trade:         ${bestTrade.symbol} (+$${bestTrade.pnl.toFixed(2)})`);
+    console.log(`   Peor trade:          ${worstTrade.symbol} ($${worstTrade.pnl.toFixed(2)})`);
+    console.log(`   Días de trading:     ${tradingDays.length}`);
+    console.log(`   ============================================\n`);
+
+    return {
         year,
         strategy,
         initialCapital,
         finalCapital: parseFloat(finalCapital.toFixed(2)),
         totalPnL: parseFloat(totalPnL.toFixed(2)),
+        totalGrossPnl: parseFloat(totalGrossPnl.toFixed(2)),
+        totalCommissions: parseFloat(totalCommissions.toFixed(2)),
         roi: parseFloat(roi.toFixed(2)),
         winRate: parseFloat(winRate.toFixed(2)),
         totalTrades: trades.length,
+        winningTrades,
         bestTrade,
         worstTrade,
         monthlyBreakdown,
-        trades: trades.slice(0, 100), // Limitar a 100 trades para no sobrecargar
-        ranAt: new Date().toISOString()
+        trades: trades.slice(0, 100),
+        ranAt: new Date().toISOString(),
+        // Metadata profesional
+        metadata: {
+            commissionPerTrade: COMMISSION_PER_TRADE,
+            slippagePercent: SLIPPAGE_PERCENT,
+            minVolumeThreshold: MIN_VOLUME_THRESHOLD,
+            maxPositionPercent: MAX_POSITION_PERCENT,
+            maxPositions: MAX_POSITIONS,
+            tradingDays: tradingDays.length,
+            backtestingType: 'PROFESSIONAL_GRADE'
+        }
     };
-
-    console.log(`\n✅ Backtesting completado:`);
-    console.log(`   Total Trades: ${trades.length}`);
-    console.log(`   Total P&L: $${totalPnL.toFixed(2)}`);
-    console.log(`   ROI: ${roi.toFixed(2)}%`);
-    console.log(`   Win Rate: ${winRate.toFixed(2)}%\n`);
-
-    return results;
 }
 
 module.exports = { runSimulation };
