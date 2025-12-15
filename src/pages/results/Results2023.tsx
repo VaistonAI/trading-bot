@@ -93,11 +93,13 @@ export const Results2023: React.FC = () => {
                     <div>
                         <h2 className="text-3xl font-bold text-text-primary mb-2 flex items-center gap-3">
                             <FaChartArea className="text-primary" />
-                            Resultados 2023
+                            <div>
+                                <h1 className="text-3xl font-bold text-text-primary mb-2">Resultados 2023</h1>
+                                <p className="text-text-secondary">
+                                    Simulación histórica de la estrategia Value Investing en 2023
+                                </p>
+                            </div>
                         </h2>
-                        <p className="text-text-secondary">
-                            Simulación histórica de la estrategia Value Investing en 2023
-                        </p>
                     </div>
                     {!results && (
                         <button
