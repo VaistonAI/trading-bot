@@ -473,28 +473,49 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         if (!bars || bars.length === 0) continue;
 
         const lastBar = bars[bars.length - 1];
-        const executionPrice = lastBar.c * (1 - SLIPPAGE_PERCENT / 100);
+
+        // Calcular volumen promedio para slippage
+        const recentBars = bars.slice(-20);
+        const avgVolume = recentBars.reduce((sum, b) => sum + b.v, 0) / recentBars.length;
+
+        // INSTITUCIONAL: Slippage dinámico en cierre
+        const slippagePercent = calculateDynamicSlippage(position.shares, avgVolume);
+        const executionPrice = lastBar.c * (1 - slippagePercent / 100);
 
         const sellValue = position.shares * executionPrice;
         const buyValue = position.shares * position.entryPrice;
         const grossPnl = sellValue - buyValue;
 
+        // INSTITUCIONAL: Fees completos
+        const regFees = calculateRegulatoryFees(sellValue, position.shares);
         const sellCommission = COMMISSION_PER_TRADE;
-        const totalTradeCommissions = position.buyCommission + sellCommission;
-        const netPnl = grossPnl - totalTradeCommissions;
+        const totalFees = position.buyCommission + sellCommission + regFees.total;
+        const netPnl = grossPnl - totalFees;
 
-        capital += sellValue - sellCommission;
-        totalCommissions += sellCommission;
+        capital += sellValue - sellCommission - regFees.total;
+        totalCommissions += sellCommission + regFees.total;
 
         const trade = {
             symbol,
-            date: tradingDays[tradingDays.length - 1],
-            entryDate: position.entryDate,
+            date: lastBar.t.split('T')[0],
+            time: lastBar.t,
+            entryDate: position.entryDate.split('T')[0],
+            entryTime: position.entryDate,
             entryPrice: position.entryPrice,
             exitPrice: executionPrice,
             shares: position.shares,
             grossPnl: parseFloat(grossPnl.toFixed(2)),
-            commissions: parseFloat(totalTradeCommissions.toFixed(2)),
+            fees: {
+                buyCommission: position.buyCommission,
+                sellCommission: sellCommission,
+                secFee: regFees.secFee,
+                tafFee: regFees.tafFee,
+                total: parseFloat(totalFees.toFixed(2))
+            },
+            slippage: {
+                buy: position.slippage,
+                sell: slippagePercent
+            },
             pnl: parseFloat(netPnl.toFixed(2)),
             pnlPercent: parseFloat(((executionPrice - position.entryPrice) / position.entryPrice * 100).toFixed(2))
         };
@@ -511,7 +532,7 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         const month = parseInt(trade.date.split('-')[1]) - 1;
         monthlyBreakdown[month].trades++;
         monthlyBreakdown[month].grossPnl += grossPnl;
-        monthlyBreakdown[month].commissions += totalTradeCommissions;
+        monthlyBreakdown[month].commissions += totalFees;
         monthlyBreakdown[month].pnl += netPnl;
 
         console.log(`   ${symbol}: Cerrado @ $${executionPrice.toFixed(2)} | P&L: $${netPnl.toFixed(2)}`);
