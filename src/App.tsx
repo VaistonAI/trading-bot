@@ -140,6 +140,30 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/results-momentum/2025"
+            element={
+              <ProtectedRoute>
+                <ResultsMomentum2025 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results-momentum/2024"
+            element={
+              <ProtectedRoute>
+                <ResultsMomentum2024 />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results-momentum/2023"
+            element={
+              <ProtectedRoute>
+                <ResultsMomentum2023 />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Research Route */}
           <Route
