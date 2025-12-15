@@ -25,6 +25,7 @@ interface MenuItem {
     label: string;
     icon: React.ReactNode;
     permission?: keyof UserPermissions;
+    submenu?: Array<{ path: string; label: string }>;
 }
 
 // Componente de partículas flotantes
@@ -271,6 +272,7 @@ export const Sidebar: React.FC = () => {
     const location = useLocation();
     const { currentUser } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
+    const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
     const [showHireModal, setShowHireModal] = useState(false);
     const [showDownloadModal, setShowDownloadModal] = useState(false);
 
@@ -291,22 +293,15 @@ export const Sidebar: React.FC = () => {
             permission: 'canViewStrategies'
         },
         {
-            path: '/results/2024',
-            label: 'Resultados 2024',
+            path: '/results',
+            label: 'Resultados',
             icon: <FaChartArea />,
-            permission: 'canViewStrategies'
-        },
-        {
-            path: '/results/2023',
-            label: 'Resultados 2023',
-            icon: <FaChartArea />,
-            permission: 'canViewStrategies'
-        },
-        {
-            path: '/results/2022',
-            label: 'Resultados 2022',
-            icon: <FaChartArea />,
-            permission: 'canViewStrategies'
+            permission: 'canViewStrategies',
+            submenu: [
+                { path: '/results/2024', label: '2024' },
+                { path: '/results/2023', label: '2023' },
+                { path: '/results/2022', label: '2022' }
+            ]
         },
         {
             path: '/users',
