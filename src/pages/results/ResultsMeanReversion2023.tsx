@@ -22,7 +22,7 @@ interface SimulationResult {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export const Resultsmeanreversion2023 = () => {
+export const ResultsMeanReversion2023 = () => {
     const [results, setResults] = useState<SimulationResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
