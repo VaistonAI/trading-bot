@@ -771,11 +771,25 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
         const tradeMonth = parseInt(trade.date.split('-')[1]) - 1; // 0-11
         const monthIndex = (tradeYear - 2023) * 12 + tradeMonth;
 
+        // DEBUG: Log primeros 3 trades
+        if (trades.length <= 3) {
+            console.log(`   🔍 Trade #${trades.length}: ${symbol}`);
+            console.log(`      Fecha: ${trade.date}, Año: ${tradeYear}, Mes: ${tradeMonth}`);
+            console.log(`      Índice calculado: ${monthIndex} (debe ser 0-35)`);
+            console.log(`      Array length: ${monthlyBreakdown.length}`);
+        }
+
         if (monthIndex >= 0 && monthIndex < monthlyBreakdown.length) {
             monthlyBreakdown[monthIndex].trades++;
             monthlyBreakdown[monthIndex].grossPnl += grossPnl;
             monthlyBreakdown[monthIndex].commissions += totalFees;
             monthlyBreakdown[monthIndex].pnl += netPnl;
+
+            if (trades.length <= 3) {
+                console.log(`      ✅ Asignado a: ${monthlyBreakdown[monthIndex].monthYear}`);
+            }
+        } else {
+            console.log(`   ⚠️ WARNING: Trade fuera de rango - Date: ${trade.date}, Index: ${monthIndex}`);
         }
 
         console.log(`   ${symbol}: Cerrado @ $${executionPrice.toFixed(2)} | P&L: $${netPnl.toFixed(2)}`);
