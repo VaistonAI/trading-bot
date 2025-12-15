@@ -28,6 +28,7 @@ export const ResultsMACD2025 = () => {
     const [isRunning, setIsRunning] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [showSaveButton, setShowSaveButton] = useState(false);
+    const [selectedYear, setSelectedYear] = useState(2023); // Tab de aÃ±o seleccionado
 
     useEffect(() => {
         loadResults();
@@ -218,7 +219,23 @@ export const ResultsMACD2025 = () => {
                         </div>
 
                         <div className="bg-white rounded-lg shadow-sm border border-border p-6 mb-6">
-                            <h3 className="text-xl font-semibold text-text-primary mb-4">Desglose Mensual</h3>
+                            <h3 className="text-xl font-semibold text-text-primary mb-4">Desglose Mensual (2023-2025)</h3>                            
+                            {/* Year Tabs */}
+                            <div className="flex gap-2 mb-4 border-b border-gray-200">
+                                {[2023, 2024, 2025].map(year => (
+                                    <button
+                                        key={year}
+                                        onClick={() => setSelectedYear(year)}
+                                        className={`px-4 py-2 font-semibold transition-colors ${
+                                            selectedYear === year
+                                                ? 'text-primary border-b-2 border-primary'
+                                                : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                    >
+                                        {year}
+                                    </button>
+                                ))}
+                            </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full">
                                     <thead className="bg-background">
@@ -229,7 +246,16 @@ export const ResultsMACD2025 = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {results.monthlyBreakdown.map((month, idx) => (
+                                        {results.monthlyBreakdown
+                                            .filter(month => {
+                                                // Si tiene propiedad 'year', usar el nuevo formato
+                                                if ('year' in month) {
+                                                    return month.year === selectedYear;
+                                                }
+                                                // Fallback: datos antiguos (12 meses sin aÃ±o)
+                                                return selectedYear === 2025;
+                                            })
+                                            .map((month, idx) => (
                                             <tr key={idx} className="border-t border-gray-100">
                                                 <td className="py-3 px-4 text-text-primary">{month.month}</td>
                                                 <td className="py-3 px-4 text-right text-text-secondary">{month.trades}</td>
