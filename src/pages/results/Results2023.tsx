@@ -26,6 +26,8 @@ export const Results2023: React.FC = () => {
     const [results, setResults] = useState<SimulationResult | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRunning, setIsRunning] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showSaveButton, setShowSaveButton] = useState(false);
 
     useEffect(() => {
         loadResults();
@@ -64,6 +66,7 @@ export const Results2023: React.FC = () => {
             if (response.ok) {
                 const data = await response.json();
                 setResults(data);
+                setShowSaveButton(true); // Mostrar botón guardar
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.error}`);
@@ -73,6 +76,29 @@ export const Results2023: React.FC = () => {
             alert('Error ejecutando simulación');
         } finally {
             setIsRunning(false);
+        }
+    };
+
+    const saveToFirebase = async () => {
+        if (!results) return;
+
+        try {
+            setIsSaving(true);
+            const { setDoc, doc } = await import('firebase/firestore');
+            const docRef = doc(db, 'simulations', results.year.toString());
+            await setDoc(docRef, {
+                ...results,
+                ranAt: new Date().toISOString(),
+                savedAt: new Date().toISOString()
+            });
+            alert('✅ Resultados guardados en Firebase exitosamente');
+            setShowSaveButton(false);
+            await loadResults(); // Recargar desde Firebase
+        } catch (error) {
+            console.error('Error saving to Firebase:', error);
+            alert('Error guardando en Firebase: ' + error.message);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -101,19 +127,34 @@ export const Results2023: React.FC = () => {
                             </div>
                         </h2>
                     </div>
-                    {!results && (
-                        <button
-                            onClick={runSimulation}
-                            disabled={isRunning}
-                            className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isRunning
-                                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                : 'bg-primary text-white hover:bg-primary-dark'
-                                }`}
-                        >
-                            <FaPlay />
-                            {isRunning ? 'Ejecutando...' : 'Ejecutar Simulación'}
-                        </button>
-                    )}
+                    <div className="flex gap-3">
+                        {!results && (
+                            <button
+                                onClick={runSimulation}
+                                disabled={isRunning}
+                                className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isRunning
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                        : 'bg-primary text-white hover:bg-primary-dark'
+                                    }`}
+                            >
+                                <FaPlay />
+                                {isRunning ? 'Ejecutando...' : 'Ejecutar Simulación'}
+                            </button>
+                        )}
+                        {showSaveButton && (
+                            <button
+                                onClick={saveToFirebase}
+                                disabled={isSaving}
+                                className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${isSaving
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                        : 'bg-green-600 text-white hover:bg-green-700'
+                                    }`}
+                            >
+                                <FaCheckCircle />
+                                {isSaving ? 'Guardando...' : 'Guardar en Firebase'}
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {results ? (
