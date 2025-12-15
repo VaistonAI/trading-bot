@@ -232,11 +232,23 @@ async function runSimulation(year, strategy, symbols, initialCapital, alpacaHead
     };
 
     // Save to Firebase
+    console.log(`\n💾 Guardando resultados en Firebase...`);
     try {
-        await db.collection('simulations').doc(year.toString()).set(results);
-        console.log(`💾 Resultados guardados en Firebase`);
+        const docRef = db.collection('simulations').doc(year.toString());
+        await docRef.set(results);
+        console.log(`✅ Resultados guardados exitosamente en Firebase`);
+        console.log(`   Documento: simulations/${year}`);
+
+        // Verificar que se guardó
+        const savedDoc = await docRef.get();
+        if (savedDoc.exists) {
+            console.log(`✅ Verificación: Documento existe en Firebase`);
+        } else {
+            console.error(`❌ ERROR: Documento NO se guardó en Firebase`);
+        }
     } catch (error) {
-        console.error('Error saving to Firebase:', error.message);
+        console.error('❌ Error saving to Firebase:', error.message);
+        console.error('   Stack:', error.stack);
     }
 
     console.log(`\n✅ Backtesting completado:`);
